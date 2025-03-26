@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "noisy-neighbors",
+	"version": "${version}",
+	"name": "Noisy Neighbors",
+	"description": "Take Minecraft's ambiance to the next level with the Noisy Neighbors mod. Gain more control over sounds and create templates based on locations in your world.",
+	"authors": [
+		"Shayne Preston"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/noisy-neighbors/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.github.prests.noisyneighbors.NoisyNeighbors"
+		],
+		"fabric-datagen": [
+			"com.github.prests.noisyneighbors.NoisyNeighborsDataGenerator"
+		],
+		"client": ["com.github.prests.noisyneighbors.NoisyNeighborsClient"]
+	},
+	"mixins": [
+		"noisy-neighbors.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
