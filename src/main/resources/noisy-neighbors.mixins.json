@@ -2,10 +2,11 @@
 	"required": true,
 	"package": "com.github.prests.noisyneighbors.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ExampleMixin"
-	],
+	"mixins": [],
 	"injectors": {
 		"defaultRequire": 1
-	}
+	},
+	"client": [
+		"SoundOptionsMixin"
+	]
 }
