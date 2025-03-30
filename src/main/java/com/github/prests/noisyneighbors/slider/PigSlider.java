@@ -1,13 +1,14 @@
 package com.github.prests.noisyneighbors.slider;
 
 import com.github.prests.noisyneighbors.config.GlobalEntityVolumeConfig;
+import com.github.prests.noisyneighbors.constant.EntityConstants;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
 
 public class PigSlider {
     private static final GlobalEntityVolumeConfig globalEntityVolumeConfig = GlobalEntityVolumeConfig.getInstance();
 
-    private static final Text title = Text.of("Pig");
+    private static final Text title = Text.of(EntityConstants.PIG_FRIENDLY_NAME);
     private final SliderWidget slider;
 
     public PigSlider() {
@@ -19,6 +20,6 @@ public class PigSlider {
     }
 
     private void onSave(Double value) {
-        globalEntityVolumeConfig.getConfigData().getEntityVolumes().get("pig").setMainVolume(value);
+        globalEntityVolumeConfig.getConfigData().getEntityVolumes().get(EntityConstants.PIG_FRIENDLY_NAME).setMainVolume(value);
     }
 }

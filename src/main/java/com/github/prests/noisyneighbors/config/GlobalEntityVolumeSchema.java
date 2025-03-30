@@ -1,5 +1,7 @@
 package com.github.prests.noisyneighbors.config;
 
+import com.github.prests.noisyneighbors.constant.EntityConstants;
+
 import java.util.Map;
 
 public class GlobalEntityVolumeSchema {
@@ -17,7 +19,7 @@ public class GlobalEntityVolumeSchema {
         GlobalEntityVolumeSchema config = new GlobalEntityVolumeSchema();
 
         config.entityVolumes = Map.of(
-                "pig", new EntityVolumeSchema(1.0)
+                EntityConstants.PIG_FRIENDLY_NAME, new EntityVolumeSchema(1.0)
         );
 
         return config;
