@@ -16,6 +16,6 @@ abstract class SoundOptionsScreenMixin {
   @Inject(method = "addOptions", at = @At("TAIL"))
   private void noisyNeighbors$addButton(CallbackInfo ci) {
     SoundOptionsScreen screen = (SoundOptionsScreen) (Object) this;
-    ((OptionsSubScreenAccessor) screen).noisyNeighbors$list().addBig(Button.builder(Component.translatable("noisy-neighbors.open"), button -> Minecraft.getInstance().setScreenAndShow(new GlobalSoundScreen(screen))).width(310).build());
+    ((OptionsSubScreenAccessor) screen).noisyNeighbors$list().addBig(Button.builder(Component.translatable("noisy-neighbors.open"), button -> Minecraft.getInstance().gui.setScreen(new GlobalSoundScreen(screen))).width(310).build());
   }
 }

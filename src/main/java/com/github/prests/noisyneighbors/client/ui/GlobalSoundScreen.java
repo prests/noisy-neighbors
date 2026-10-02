@@ -20,14 +20,14 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
     net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();
     WorldIdentity world = WorldIdentity.current(client);
     net.minecraft.client.gui.components.Button zones = net.minecraft.client.gui.components.Button.builder(
-        Component.translatable("noisy-neighbors.edit-world-zones"), button -> client.setScreenAndShow(new WorldZonesScreen(this, world)))
+        Component.translatable("noisy-neighbors.edit-world-zones"), button -> client.gui.setScreen(new WorldZonesScreen(this, world)))
         .width(310).build();
     zones.active = world != null && client.level != null;
     list.addBig(zones);
     net.minecraft.client.gui.components.Button create = net.minecraft.client.gui.components.Button.builder(
         Component.translatable("noisy-neighbors.create-zone"), button -> {
           ZoneSelection.begin();
-          client.setScreenAndShow(null);
+          client.gui.setScreen(null);
         }).width(310).build();
     create.active = zones.active;
     list.addBig(create);

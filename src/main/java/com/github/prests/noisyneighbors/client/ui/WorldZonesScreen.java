@@ -29,7 +29,7 @@ public final class WorldZonesScreen extends OptionsSubScreen {
     list.addBig(outlines);
     list.addBig(Button.builder(Component.translatable("noisy-neighbors.create-zone"), button -> {
       ZoneSelection.begin();
-      Minecraft.getInstance().setScreenAndShow(null);
+      Minecraft.getInstance().gui.setScreen(null);
     }).width(310).build());
 
     SettingsStore.World settings = SettingsStore.data().worlds.get(world.key());
@@ -42,7 +42,7 @@ public final class WorldZonesScreen extends OptionsSubScreen {
 
     for (Zone zone : settings.zones) {
       list.addBig(Button.builder(Component.literal(zone.name() + " — " + zone.dimension().replace("minecraft:", "")),
-          button -> Minecraft.getInstance().setScreenAndShow(new ZoneSoundScreen(this, world.key(), zone.id())))
+          button -> Minecraft.getInstance().gui.setScreen(new ZoneSoundScreen(new WorldZonesScreen(lastScreen, world), world.key(), zone.id())))
           .width(310).build());
     }
   }

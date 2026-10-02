@@ -30,6 +30,9 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     Button details = Button.builder(Component.literal(zone.name() + " — " + bounds(zone)), button -> {}).width(310).build();
     details.active = false;
     list.addBig(details);
+    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
+        button -> Minecraft.getInstance().gui.setScreen(new ZoneNameScreen(this, worldKey, zoneId, zone.name())))
+        .width(310).build());
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
   }
@@ -37,6 +40,10 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
   @Override public void onClose() {
     SettingsStore.save();
     super.onClose();
+  }
+
+  ZoneSoundScreen refreshed() {
+    return new ZoneSoundScreen(lastScreen, worldKey, zoneId);
   }
 
   private Zone zone() {
