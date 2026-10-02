@@ -20,5 +20,10 @@ jobs:
           java-version: '25'
       - name: Build and run JVM/server tests
         run: ./gradlew build
+      - name: Install headless OpenGL dependencies
+        run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
       - name: Run production client GameTest
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
         run: ./gradlew runProductionClientGameTest
