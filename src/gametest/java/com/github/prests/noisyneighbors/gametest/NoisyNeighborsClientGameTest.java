@@ -25,14 +25,13 @@ public final class NoisyNeighborsClientGameTest implements FabricClientGameTest 
       if (!MobSoundCatalog.isKnown("minecraft:entity.cow.ambient")) {
         throw new AssertionError("client initializer did not load the sound catalog");
       }
-      verifySoundMixinCapturesConfiguredVolume();
+      context.runOnClient(NoisyNeighborsClientGameTest::verifySoundMixinCapturesConfiguredVolume);
     }
   }
 
-  private static void verifySoundMixinCapturesConfiguredVolume() {
+  private static void verifySoundMixinCapturesConfiguredVolume(Minecraft client) {
     Integer previous = SettingsStore.data().global.put("minecraft:cow", 0);
     try {
-      Minecraft client = Minecraft.getInstance();
       SimpleSoundInstance sound = new SimpleSoundInstance(SoundEvent.createVariableRangeEvent(Identifier.parse("minecraft:entity.cow.ambient")),
           SoundSource.NEUTRAL, 1F, 1F,
           SoundInstance.createUnseededRandom(), client.player.getX(), client.player.getY(), client.player.getZ());
