@@ -1,36 +1,47 @@
 # Noisy Neighbor
 
-A client-only Fabric mod for personal vanilla-mob sound controls. Open **Options → Music & Sound → Advanced Sound Controls** to set per-mob global volume limits; the settings are stored locally in `config/noisy-neighbors.json`.
+**Enjoy Minecraft's sounds everywhere—except the ones that wear out their welcome.**
 
-To create a zone, choose **Edit World Zones → Create Zone**, then right-click its two opposite corner blocks. The action bar guides each step; press the configured **Create Zone** key again to cancel. Choose a zone to set its per-mob volume limits. Use **Zone Outlines: On** on that screen to draw visible wireframes around enabled zones in the current dimension.
+Minecraft's built-in sound controls are broad: turning down a noisy animal farm can also silence the creatures and ambient moments that make exploring feel alive. Noisy Neighbor gives you granular controls for vanilla mob sounds, so you can quiet a crowded farm without turning the whole game down.
 
-No server installation is required. Only explicitly catalogued vanilla mob events are changed; player, block, unknown, modded, and mismatched entity sounds remain vanilla. Minecraft cannot distinguish proxy-hosted worlds that share an endpoint and dimension, so those worlds share settings.
+Set a volume for each creature across every world, then create sound zones for places that need their own rules. Keep the sounds you enjoy and silence those noisy neighbors.
 
-## Compatibility
+## Getting started
 
-- Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5 or later
-- Java 25
-- Fabric API 0.161.0+26.3
+Noisy Neighbor is client-side only: install it on your client and use it in single-player or multiplayer worlds—no server installation is needed.
 
-Fabric is the only supported loader.
+### Set global sound controls
 
-## Development
+1. Open **Options → Music & Sound → Advanced Sound Controls**.
+2. Use the sliders to set a volume for each mob.
+3. Set a mob to **0%** to mute it everywhere, or choose a lower volume to keep it in the background.
 
-Install JDK 25. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended by Fabric; VS Code is also supported. Import this directory as a Gradle project.
+These controls are a great default when a particular creature is always too loud.
 
-```sh
-./gradlew runClient
-./gradlew test
-./gradlew build
-./gradlew runProductionClientGameTest
-```
+## Create a sound zone
 
-`runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
+Use a zone when you only want quieter sounds in one place, such as an animal farm, mob grinder, or trading hall.
 
-## Version policy
+1. Open **Edit World Zones**.
+2. Select **Create Zone**.
+3. Right-click two opposite corner blocks to mark the zone's bounds. The action bar guides you through the selection.
+4. Open the new zone to adjust each mob's volume.
 
-`main` supports the newest Minecraft release. When a new release becomes the target, an older version gets a maintenance branch (for example, `mc-26.3`) only when it needs further fixes. Each Minecraft version is released as its own JAR; multi-version build tooling will be added only if maintaining multiple versions becomes necessary.
+Press your configured **Create Zone** key again to cancel while choosing corners.
+
+## Edit a zone
+
+Open **Edit World Zones**, then select a zone to manage it:
+
+- **Rename Zone** gives the zone a helpful name.
+- **Edit Zone Color** changes its outline color.
+- **Edit Zone Bounds** lets you choose two new corner blocks.
+- **Delete Zone** removes it.
+- **Zone Outlines: On** shows enabled zones in your current dimension, making it easy to see exactly where they apply.
+
+## What Noisy Neighbor changes
+
+Noisy Neighbor changes only catalogued vanilla mob sounds. Player, block, unknown, and modded sounds continue to use Minecraft's normal audio behavior. Your settings are stored locally in `config/noisy-neighbors.json`.
 
 ## License
 

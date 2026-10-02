@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SoundOptionsScreen.class)
 abstract class SoundOptionsScreenMixin {
-  @Inject(method = "addOptions", at = @At("TAIL"))
+  @Inject(method = "addOptions", at = @At("HEAD"))
   private void noisyNeighbors$addButton(CallbackInfo ci) {
     SoundOptionsScreen screen = (SoundOptionsScreen) (Object) this;
     ((OptionsSubScreenAccessor) screen).noisyNeighbors$list().addBig(Button.builder(Component.translatable("noisy-neighbors.open"), button -> Minecraft.getInstance().gui.setScreen(new GlobalSoundScreen(screen))).width(310).build());
