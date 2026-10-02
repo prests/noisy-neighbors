@@ -1,6 +1,6 @@
 # Noisy Neighbor
 
-**Enjoy Minecraft's sounds everywhere—except the ones that wear out their welcome.**
+**Enjoy Minecraft's sounds everywhere... except the ones that wear out their welcome.**
 
 Minecraft's built-in sound controls are broad: turning down a noisy animal farm can also silence the creatures and ambient moments that make exploring feel alive. Noisy Neighbor gives you granular controls for vanilla mob sounds, so you can quiet a crowded farm without turning the whole game down.
 
