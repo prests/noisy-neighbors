@@ -9,16 +9,15 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 
 public final class NoisyNeighborsClient implements ClientModInitializer {
   @Override public void onInitializeClient() {
     SettingsStore.load();
     MobSoundCatalog.load();
+    NoisyNeighborsKeyMappings.register();
     ZoneOutlines.register();
     UseBlockCallback.EVENT.register(ZoneSelection::useBlock);
-    UseItemCallback.EVENT.register(ZoneSelection::useItem);
-    ClientTickEvents.END_CLIENT_TICK.register(ZoneSelection::tick);
+    ClientTickEvents.END_CLIENT_TICK.register(NoisyNeighborsKeyMappings::tick);
     ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
       ZoneSelection.reset();
       NoisyNeighbors.LOGGER.debug("Noisy Neighbor cleared active selection");

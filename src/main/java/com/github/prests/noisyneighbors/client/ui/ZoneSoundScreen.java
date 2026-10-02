@@ -3,6 +3,7 @@ package com.github.prests.noisyneighbors.client.ui;
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
 import com.github.prests.noisyneighbors.client.zone.Zone;
+import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.UUID;
@@ -37,6 +38,13 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.color"),
         button -> Minecraft.getInstance().gui.setScreen(new ZoneColorScreen(this, worldKey, zoneId, zone.color())))
         .width(310).build());
+    Button editBounds = Button.builder(Component.translatable("noisy-neighbors.zone.edit-bounds"), button -> {
+      ZoneSelection.beginEdit(worldKey, zoneId);
+      Minecraft.getInstance().gui.setScreen(null);
+    }).width(310).build();
+    editBounds.active = Minecraft.getInstance().level != null
+        && zone.dimension().equals(Minecraft.getInstance().level.dimension().identifier().toString());
+    list.addBig(editBounds);
     list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.delete"),
         button -> confirmDelete(zone)).width(310).build());
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
