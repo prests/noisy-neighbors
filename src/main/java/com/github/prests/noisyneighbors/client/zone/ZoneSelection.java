@@ -83,12 +83,8 @@ public final class ZoneSelection {
       SettingsStore.updateZone(editingWorldKey, editingZoneId, zone -> new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(),
           level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(), second.getX(), second.getY(), second.getZ(), zone.volumes()));
     } else {
-      SettingsStore.World world = SettingsStore.data().worlds.computeIfAbsent(identity.key(), ignored -> {
-        SettingsStore.World created = new SettingsStore.World();
-        created.displayName = identity.displayName();
-        return created;
-      });
-      world.zones.add(new Zone(UUID.randomUUID(), "Zone " + (world.zones.size() + 1), true,
+      int number = SettingsStore.data().worlds.getOrDefault(identity.key(), new SettingsStore.World()).zones.size() + 1;
+      SettingsStore.addZone(identity, new Zone(UUID.randomUUID(), "Zone " + number, true,
           level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(),
           second.getX(), second.getY(), second.getZ(), Map.of()));
     }

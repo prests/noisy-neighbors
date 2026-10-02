@@ -20,59 +20,94 @@ import net.fabricmc.loader.api.FabricLoader;
 /** Client-only, sparse settings. Invalid settings are never used. */
 public final class SettingsStore {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-  private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("noisy-neighbors.json");
-  private static Data data = new Data();
+  private static final Store CLIENT = new Store(FabricLoader.getInstance().getConfigDir().resolve("noisy-neighbors.json"));
 
   private SettingsStore() {}
-  public static Data data() { return data; }
 
-  public static void removeWorld(String worldKey) {
-    if (data.worlds.remove(worldKey) != null) save();
+  /** Creates an isolated store for tests or tools; the client uses the static facade below. */
+  public static Store at(Path file) {
+    return new Store(file);
   }
 
-  public static void removeZone(String worldKey, UUID zoneId) {
-    World world = data.worlds.get(worldKey);
-    if (world != null) world.zones.removeIf(zone -> zone.id().equals(zoneId));
-  }
+  public static Data data() { return CLIENT.data(); }
+  public static void removeWorld(String worldKey) { CLIENT.removeWorld(worldKey); }
+  public static void removeZone(String worldKey, UUID zoneId) { CLIENT.removeZone(worldKey, zoneId); }
+  public static void updateZone(String worldKey, UUID zoneId, UnaryOperator<Zone> update) { CLIENT.updateZone(worldKey, zoneId, update); }
+  public static Zone addZone(WorldIdentity identity, Zone zone) { return CLIENT.addZone(identity, zone); }
+  public static void save() { CLIENT.save(); }
+  public static void load() { CLIENT.load(); }
 
-  public static void updateZone(String worldKey, UUID zoneId, UnaryOperator<Zone> update) {
-    World world = data.worlds.get(worldKey);
-    if (world == null) return;
-    for (int index = 0; index < world.zones.size(); index++) {
-      Zone zone = world.zones.get(index);
-      if (zone.id().equals(zoneId)) {
-        world.zones.set(index, update.apply(zone));
-        return;
+  public static final class Store {
+    private final Path file;
+    private Data data = new Data();
+
+    private Store(Path file) {
+      this.file = file;
+    }
+
+    public Data data() { return data; }
+
+    public void removeWorld(String worldKey) {
+      if (data.worlds.remove(worldKey) != null) save();
+    }
+
+    public void removeZone(String worldKey, UUID zoneId) {
+      World world = data.worlds.get(worldKey);
+      if (world != null) world.zones.removeIf(zone -> zone.id().equals(zoneId));
+    }
+
+    public void updateZone(String worldKey, UUID zoneId, UnaryOperator<Zone> update) {
+      World world = data.worlds.get(worldKey);
+      if (world == null) return;
+      for (int index = 0; index < world.zones.size(); index++) {
+        Zone zone = world.zones.get(index);
+        if (zone.id().equals(zoneId)) {
+          world.zones.set(index, update.apply(zone));
+          return;
+        }
       }
     }
-  }
 
-  public static void load() {
-    if (!Files.exists(FILE)) return;
-    try {
-      Data loaded = GSON.fromJson(Files.readString(FILE), Data.class);
-      if (loaded == null || loaded.version != 1) throw new IOException("Unsupported settings version");
-      loaded.validate();
-      data = loaded;
-    } catch (Exception exception) {
-      NoisyNeighbors.LOGGER.error("Ignoring corrupt Noisy Neighbor settings at {}", FILE, exception);
+    public World world(WorldIdentity identity) {
+      return data.worlds.computeIfAbsent(identity.key(), ignored -> {
+        World created = new World();
+        created.displayName = identity.displayName();
+        return created;
+      });
     }
-  }
 
-  public static void save() {
-    data.validate();
-    Path temporary = FILE.resolveSibling(FILE.getFileName() + ".tmp");
-    try {
-      Files.createDirectories(FILE.getParent());
-      Files.writeString(temporary, GSON.toJson(data), StandardCharsets.UTF_8);
+    public Zone addZone(WorldIdentity identity, Zone zone) {
+      world(identity).zones.add(zone);
+      return zone;
+    }
+
+    public void load() {
+      if (!Files.exists(file)) return;
       try {
-        Files.move(temporary, FILE, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-      } catch (IOException ignored) {
-        Files.move(temporary, FILE, StandardCopyOption.REPLACE_EXISTING);
+        Data loaded = GSON.fromJson(Files.readString(file), Data.class);
+        if (loaded == null || loaded.version != 1) throw new IOException("Unsupported settings version");
+        loaded.validate();
+        data = loaded;
+      } catch (Exception exception) {
+        NoisyNeighbors.LOGGER.error("Ignoring corrupt Noisy Neighbor settings at {}", file, exception);
       }
-    } catch (IOException exception) {
-      NoisyNeighbors.LOGGER.error("Could not save Noisy Neighbor settings; keeping existing file", exception);
-      try { Files.deleteIfExists(temporary); } catch (IOException ignored) { }
+    }
+
+    public void save() {
+      data.validate();
+      Path temporary = file.resolveSibling(file.getFileName() + ".tmp");
+      try {
+        Files.createDirectories(file.getParent());
+        Files.writeString(temporary, GSON.toJson(data), StandardCharsets.UTF_8);
+        try {
+          Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ignored) {
+          Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
+        }
+      } catch (IOException exception) {
+        NoisyNeighbors.LOGGER.error("Could not save Noisy Neighbor settings; keeping existing file", exception);
+        try { Files.deleteIfExists(temporary); } catch (IOException ignored) { }
+      }
     }
   }
 
@@ -93,5 +128,7 @@ public final class SettingsStore {
     void validate() { zones.removeIf(zone -> zone == null || !zone.volumes().entrySet().stream().allMatch(e -> valid(e.getKey(), e.getValue()))); }
   }
 
-  private static boolean valid(String id, Integer value) { return id != null && !id.isBlank() && value != null && value >= 0 && value <= 100; }
+  private static boolean valid(String id, Integer value) {
+    return id != null && !id.isBlank() && value != null && value >= 0 && value <= 100;
+  }
 }

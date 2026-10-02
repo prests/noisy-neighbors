@@ -27,15 +27,23 @@ public final class VolumePolicy {
   }
 
   public static float multiplier(String eventId, String sourceMobId, String world, String dimension, double x, double y, double z) {
+    return multiplier(SettingsStore.data(), eventId, sourceMobId, world, dimension, x, y, z);
+  }
+
+  public static float multiplier(SettingsStore.Data data, String eventId, String sourceMobId, String world, String dimension,
+                                 double x, double y, double z) {
     String mob = MobSoundCatalog.mobFor(eventId, sourceMobId);
     if (mob == null) return 1F;
-    SettingsStore.Data data = SettingsStore.data();
     double result = data.global.getOrDefault(mob, 100) / 100.0;
     SettingsStore.World settings = data.worlds.get(world);
     if (settings != null) for (Zone zone : settings.zones) {
       if (zone.dimension().equals(dimension) && zone.contains(x, y, z)) result *= zone.multiplier(mob);
     }
     return (float) result;
+  }
+
+  public static float apply(float originalVolume, float multiplier) {
+    return originalVolume * multiplier;
   }
 
   static float multiplier(Map<String, Integer> global, Zone... zones) {

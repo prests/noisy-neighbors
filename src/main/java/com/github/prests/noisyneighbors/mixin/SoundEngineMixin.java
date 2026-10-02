@@ -38,13 +38,13 @@ abstract class SoundEngineMixin {
   @Redirect(method = "play", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundEngine;calculateVolume(FLnet/minecraft/sounds/SoundSource;)F"))
   private float noisyNeighbors$applyInitialVolume(SoundEngine engine, float volume, SoundSource source) {
     SoundInstance sound = noisyNeighbors$startingSound.get();
-    return calculateVolume(volume, source) * (sound == null ? 1F : noisyNeighbors$multipliers.getOrDefault(sound, 1F));
+    return VolumePolicy.apply(calculateVolume(volume, source), sound == null ? 1F : noisyNeighbors$multipliers.getOrDefault(sound, 1F));
   }
 
   @Inject(method = "calculateVolume(Lnet/minecraft/client/resources/sounds/SoundInstance;)F", at = @At("RETURN"), cancellable = true)
   private void noisyNeighbors$applyVolume(SoundInstance sound, CallbackInfoReturnable<Float> callback) {
     float multiplier = noisyNeighbors$multipliers.computeIfAbsent(sound, this::noisyNeighbors$multiplierAtStart);
-    callback.setReturnValue(callback.getReturnValueF() * multiplier);
+    callback.setReturnValue(VolumePolicy.apply(callback.getReturnValueF(), multiplier));
   }
 
   private float noisyNeighbors$multiplierAtStart(SoundInstance sound) {

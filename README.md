@@ -21,8 +21,9 @@ Install JDK 25. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended 
 
 ```sh
 ./gradlew runClient
+./gradlew test
 ./gradlew build
-./gradlew focusedCheck
+./gradlew runProductionClientGameTest
 ```
 
 `runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
