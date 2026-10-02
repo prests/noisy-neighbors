@@ -11,12 +11,16 @@
 		"sources": "https://github.com/prests/noisy-neighbors"
 	},
 	"license": "MIT",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"com.github.prests.noisyneighbors.NoisyNeighbors"
+		],
+		"client": [
+			"com.github.prests.noisyneighbors.client.NoisyNeighborsClient"
 		]
 	},
+	"mixins": ["noisy-neighbors.client.mixins.json"],
 	"depends": {
 		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.3",

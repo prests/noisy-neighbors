@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.github.prests.noisyneighbors.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "OptionsSubScreenAccessor",
+    "SoundOptionsScreenMixin",
+    "EntityBoundSoundAccessor",
+    "SoundEngineMixin",
+    "GameRendererMixin",
+    "MinecraftServerAccessor",
+    "WorldListEntryMixin",
+    "JoinMultiplayerScreenMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

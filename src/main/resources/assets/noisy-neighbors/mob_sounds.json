@@ -1,0 +1,14 @@
+{
+  "mobs": {
+    "minecraft:cow": ["minecraft:entity.cow.ambient", "minecraft:entity.cow.hurt", "minecraft:entity.cow.death", "minecraft:entity.cow.step", "minecraft:entity.cow.milk", "minecraft:entity.cow_moody.ambient", "minecraft:entity.cow_moody.hurt", "minecraft:entity.cow_moody.death", "minecraft:entity.cow_moody.step"],
+    "minecraft:pig": ["minecraft:entity.pig.ambient", "minecraft:entity.pig.hurt", "minecraft:entity.pig.death", "minecraft:entity.pig.step", "minecraft:entity.pig.saddle"],
+    "minecraft:sheep": ["minecraft:entity.sheep.ambient", "minecraft:entity.sheep.hurt", "minecraft:entity.sheep.death", "minecraft:entity.sheep.step", "minecraft:entity.sheep.shear"],
+    "minecraft:chicken": ["minecraft:entity.chicken.ambient", "minecraft:entity.chicken.hurt", "minecraft:entity.chicken.death", "minecraft:entity.chicken.step", "minecraft:entity.chicken.egg"],
+    "minecraft:wolf": ["minecraft:entity.wolf.ambient", "minecraft:entity.wolf.hurt", "minecraft:entity.wolf.death", "minecraft:entity.wolf.growl", "minecraft:entity.wolf.howl", "minecraft:entity.wolf.whine", "minecraft:entity.wolf.pant"],
+    "minecraft:cat": ["minecraft:entity.cat.ambient", "minecraft:entity.cat.hurt", "minecraft:entity.cat.death", "minecraft:entity.cat.purr", "minecraft:entity.cat.purreow", "minecraft:entity.cat.hiss"],
+    "minecraft:horse": ["minecraft:entity.horse.ambient", "minecraft:entity.horse.hurt", "minecraft:entity.horse.death", "minecraft:entity.horse.gallop", "minecraft:entity.horse.breathe", "minecraft:entity.horse.eat"],
+    "minecraft:villager": ["minecraft:entity.villager.ambient", "minecraft:entity.villager.hurt", "minecraft:entity.villager.death", "minecraft:entity.villager.yes", "minecraft:entity.villager.no", "minecraft:entity.villager.trade"],
+    "minecraft:zombie": ["minecraft:entity.zombie.ambient", "minecraft:entity.zombie.hurt", "minecraft:entity.zombie.death", "minecraft:entity.zombie.step", "minecraft:entity.zombie.attack_wooden_door", "minecraft:entity.zombie.break_wooden_door"]
+  },
+  "shared": ["minecraft:entity.generic.swim", "minecraft:entity.generic.splash", "minecraft:entity.generic.hurt", "minecraft:entity.generic.death", "minecraft:entity.generic.small_fall", "minecraft:entity.generic.big_fall"]
+}
