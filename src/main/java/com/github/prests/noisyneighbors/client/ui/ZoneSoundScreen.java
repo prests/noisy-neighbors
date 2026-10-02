@@ -9,6 +9,7 @@ import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,11 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
         button -> Minecraft.getInstance().gui.setScreen(new ZoneNameScreen(this, worldKey, zoneId, zone.name())))
         .width(310).build());
+    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.color"),
+        button -> Minecraft.getInstance().gui.setScreen(new ZoneColorScreen(this, worldKey, zoneId, zone.color())))
+        .width(310).build());
+    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.delete"),
+        button -> confirmDelete(zone)).width(310).build());
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
   }
@@ -40,6 +46,20 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
   @Override public void onClose() {
     SettingsStore.save();
     super.onClose();
+  }
+
+  private void confirmDelete(Zone zone) {
+    Minecraft.getInstance().gui.setScreen(new ConfirmScreen(confirmed -> {
+      if (confirmed) {
+        SettingsStore.removeZone(worldKey, zoneId);
+        SettingsStore.save();
+        Minecraft.getInstance().gui.setScreen(lastScreen);
+      } else {
+        Minecraft.getInstance().gui.setScreen(this);
+      }
+    }, Component.translatable("noisy-neighbors.zone.delete.title", zone.name()),
+        Component.translatable("noisy-neighbors.zone.delete.warning"),
+        Component.translatable("noisy-neighbors.zone.delete"), Component.translatable("gui.cancel")));
   }
 
   ZoneSoundScreen refreshed() {
@@ -75,7 +95,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
       SettingsStore.updateZone(worldKey, zoneId, zone -> {
         var volumes = new HashMap<>(zone.volumes());
         volumes.put(mob, volume);
-        return new Zone(zone.id(), zone.name(), zone.enabled(), zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
+        return new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(), zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
             zone.maxX(), zone.maxY(), zone.maxZ(), volumes);
       });
     }

@@ -3,14 +3,20 @@ package com.github.prests.noisyneighbors.client.zone;
 import java.util.Map;
 import java.util.UUID;
 
-public record Zone(UUID id, String name, boolean enabled, String dimension, int minX, int minY, int minZ,
+public record Zone(UUID id, String name, boolean enabled, Integer color, String dimension, int minX, int minY, int minZ,
                    int maxX, int maxY, int maxZ, Map<String, Integer> volumes) {
+  public Zone(UUID id, String name, boolean enabled, String dimension, int minX, int minY, int minZ,
+              int maxX, int maxY, int maxZ, Map<String, Integer> volumes) {
+    this(id, name, enabled, null, dimension, minX, minY, minZ, maxX, maxY, maxZ, volumes);
+  }
+
   public Zone {
     int lowX = Math.min(minX, maxX), highX = Math.max(minX, maxX);
     int lowY = Math.min(minY, maxY), highY = Math.max(minY, maxY);
     int lowZ = Math.min(minZ, maxZ), highZ = Math.max(minZ, maxZ);
     minX = lowX; maxX = highX; minY = lowY; maxY = highY; minZ = lowZ; maxZ = highZ;
     name = name == null || name.isBlank() ? "Zone" : name.trim();
+    color = color == null ? 0x33E5FF : color & 0xFFFFFF;
     volumes = volumes == null ? Map.of() : Map.copyOf(volumes);
   }
 

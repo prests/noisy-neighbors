@@ -3,7 +3,6 @@ package com.github.prests.noisyneighbors.client.ui;
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
-import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import java.util.Comparator;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,13 +23,6 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
         .width(310).build();
     zones.active = world != null && client.level != null;
     list.addBig(zones);
-    net.minecraft.client.gui.components.Button create = net.minecraft.client.gui.components.Button.builder(
-        Component.translatable("noisy-neighbors.create-zone"), button -> {
-          ZoneSelection.begin();
-          client.gui.setScreen(null);
-        }).width(310).build();
-    create.active = zones.active;
-    list.addBig(create);
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .forEach(mob -> list.addBig(new MobSlider(mob)));
   }

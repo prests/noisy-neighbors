@@ -26,6 +26,15 @@ public final class SettingsStore {
   private SettingsStore() {}
   public static Data data() { return data; }
 
+  public static void removeWorld(String worldKey) {
+    if (data.worlds.remove(worldKey) != null) save();
+  }
+
+  public static void removeZone(String worldKey, UUID zoneId) {
+    World world = data.worlds.get(worldKey);
+    if (world != null) world.zones.removeIf(zone -> zone.id().equals(zoneId));
+  }
+
   public static void updateZone(String worldKey, UUID zoneId, UnaryOperator<Zone> update) {
     World world = data.worlds.get(worldKey);
     if (world == null) return;

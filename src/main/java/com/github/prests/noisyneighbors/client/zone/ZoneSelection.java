@@ -10,11 +10,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
-/** Client-only two-corner feather selection. */
+/** Client-only two-corner block selection. */
 public final class ZoneSelection {
   private static BlockPos firstCorner;
   private static boolean active;
@@ -32,7 +31,7 @@ public final class ZoneSelection {
   }
 
   public static InteractionResult useBlock(Player player, Level level, InteractionHand hand, BlockHitResult hit) {
-    if (!active || !level.isClientSide() || hand != InteractionHand.MAIN_HAND || !player.getMainHandItem().is(Items.FEATHER)) return InteractionResult.PASS;
+    if (!active || !level.isClientSide() || hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
     BlockPos corner = hit.getBlockPos().immutable();
     if (firstCorner == null) {
@@ -47,14 +46,14 @@ public final class ZoneSelection {
   }
 
   public static InteractionResult useItem(Player player, Level level, InteractionHand hand) {
-    if (!active || !level.isClientSide() || hand != InteractionHand.MAIN_HAND || !player.getMainHandItem().is(Items.FEATHER)) return InteractionResult.PASS;
+    if (!active || !level.isClientSide() || hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
     reset();
     overlay(Component.translatable("noisy-neighbors.selection.cancelled"));
     return InteractionResult.FAIL;
   }
 
   public static void tick(Minecraft client) {
-    if (!active || client.player == null || !client.player.getMainHandItem().is(Items.FEATHER)) return;
+    if (!active || client.player == null) return;
     Component message = firstCorner == null
         ? Component.translatable("noisy-neighbors.selection.first-prompt")
         : Component.translatable("noisy-neighbors.selection.second-prompt", firstCorner.getX(), firstCorner.getY(), firstCorner.getZ());

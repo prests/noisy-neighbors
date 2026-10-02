@@ -61,7 +61,8 @@ public final class ZoneOutlines {
     }
     String dimension = context.level().dimension().identifier().toString();
     zones = settings.zones.stream().filter(zone -> zone.enabled() && zone.dimension().equals(dimension))
-        .map(zone -> new Bounds(zone.minX(), zone.minY(), zone.minZ(), zone.maxX() + 1, zone.maxY() + 1, zone.maxZ() + 1)).toList();
+        .sorted(java.util.Comparator.comparing(zone -> zone.id().toString()))
+        .map(zone -> new Bounds(zone.minX(), zone.minY(), zone.minZ(), zone.maxX() + 1, zone.maxY() + 1, zone.maxZ() + 1, zone.color())).toList();
   }
 
   private static void render(LevelRenderContext context) {
@@ -85,17 +86,18 @@ public final class ZoneOutlines {
 
   private static void box(Matrix4fc matrix, VertexConsumer vertices, Bounds box) {
     float x1 = box.minX, y1 = box.minY, z1 = box.minZ, x2 = box.maxX, y2 = box.maxY, z2 = box.maxZ;
-    line(matrix, vertices, x1, y1, z1, x2, y1, z1); line(matrix, vertices, x2, y1, z1, x2, y1, z2);
-    line(matrix, vertices, x2, y1, z2, x1, y1, z2); line(matrix, vertices, x1, y1, z2, x1, y1, z1);
-    line(matrix, vertices, x1, y2, z1, x2, y2, z1); line(matrix, vertices, x2, y2, z1, x2, y2, z2);
-    line(matrix, vertices, x2, y2, z2, x1, y2, z2); line(matrix, vertices, x1, y2, z2, x1, y2, z1);
-    line(matrix, vertices, x1, y1, z1, x1, y2, z1); line(matrix, vertices, x2, y1, z1, x2, y2, z1);
-    line(matrix, vertices, x2, y1, z2, x2, y2, z2); line(matrix, vertices, x1, y1, z2, x1, y2, z2);
+    line(matrix, vertices, box.color, x1, y1, z1, x2, y1, z1); line(matrix, vertices, box.color, x2, y1, z1, x2, y1, z2);
+    line(matrix, vertices, box.color, x2, y1, z2, x1, y1, z2); line(matrix, vertices, box.color, x1, y1, z2, x1, y1, z1);
+    line(matrix, vertices, box.color, x1, y2, z1, x2, y2, z1); line(matrix, vertices, box.color, x2, y2, z1, x2, y2, z2);
+    line(matrix, vertices, box.color, x2, y2, z2, x1, y2, z2); line(matrix, vertices, box.color, x1, y2, z2, x1, y2, z1);
+    line(matrix, vertices, box.color, x1, y1, z1, x1, y2, z1); line(matrix, vertices, box.color, x2, y1, z1, x2, y2, z1);
+    line(matrix, vertices, box.color, x2, y1, z2, x2, y2, z2); line(matrix, vertices, box.color, x1, y1, z2, x1, y2, z2);
   }
 
-  private static void line(Matrix4fc matrix, VertexConsumer vertices, float x1, float y1, float z1, float x2, float y2, float z2) {
-    vertices.addVertex(matrix, x1, y1, z1).setColor(0.2F, 0.9F, 1F, 0.9F).setNormal(0, 1, 0).setLineWidth(6F);
-    vertices.addVertex(matrix, x2, y2, z2).setColor(0.2F, 0.9F, 1F, 0.9F).setNormal(0, 1, 0).setLineWidth(6F);
+  private static void line(Matrix4fc matrix, VertexConsumer vertices, int color, float x1, float y1, float z1, float x2, float y2, float z2) {
+    float red = ((color >> 16) & 0xFF) / 255F, green = ((color >> 8) & 0xFF) / 255F, blue = (color & 0xFF) / 255F;
+    vertices.addVertex(matrix, x1, y1, z1).setColor(red, green, blue, 0.9F).setNormal(0, 1, 0).setLineWidth(18F);
+    vertices.addVertex(matrix, x2, y2, z2).setColor(red, green, blue, 0.9F).setNormal(0, 1, 0).setLineWidth(18F);
   }
 
   private static void draw(Minecraft client, StagedVertexBuffer.ExecuteInfo info, RenderPipeline pipeline) {
@@ -115,5 +117,5 @@ public final class ZoneOutlines {
     }
   }
 
-  private record Bounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {}
+  private record Bounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, int color) {}
 }

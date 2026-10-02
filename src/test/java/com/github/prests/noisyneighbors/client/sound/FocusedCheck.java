@@ -1,5 +1,6 @@
 package com.github.prests.noisyneighbors.client.sound;
 
+import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.zone.Zone;
 import java.util.Map;
 import java.util.UUID;
@@ -8,6 +9,8 @@ import java.util.UUID;
 public final class FocusedCheck {
   public static void main(String[] args) {
     MobSoundCatalog.load();
+    assert !WorldIdentity.local("first-save", "First").key().equals(WorldIdentity.local("second-save", "Second").key())
+        : "local saves must have isolated settings";
     Zone zone = new Zone(UUID.randomUUID(), "negative", true, "minecraft:overworld", 4, 8, 2, -2, 8, -4, Map.of("minecraft:cow", 50));
     assert zone.contains(-2, 8.9, -4) : "normalized corners include negative edge";
     assert zone.contains(4.99, 8, 2.99) : "same-Y is one block high";
