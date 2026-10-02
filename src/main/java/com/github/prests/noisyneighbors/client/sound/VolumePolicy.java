@@ -1,6 +1,7 @@
 package com.github.prests.noisyneighbors.client.sound;
 
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
+import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.zone.Zone;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
@@ -20,10 +21,9 @@ public final class VolumePolicy {
     }
     Minecraft client = Minecraft.getInstance();
     if (client.level == null) return 1F;
-    String world = client.getCurrentServer() == null
-        ? "local:" + client.getSingleplayerServer().getServerDirectory().getFileName()
-        : "server:" + client.getCurrentServer().ip.toLowerCase(java.util.Locale.ROOT);
-    return multiplier(eventId, sourceMob, world, client.level.dimension().identifier().toString(), x, y, z);
+    WorldIdentity world = WorldIdentity.current(client);
+    if (world == null) return 1F;
+    return multiplier(eventId, sourceMob, world.key(), client.level.dimension().identifier().toString(), x, y, z);
   }
 
   public static float multiplier(String eventId, String sourceMobId, String world, String dimension, double x, double y, double z) {

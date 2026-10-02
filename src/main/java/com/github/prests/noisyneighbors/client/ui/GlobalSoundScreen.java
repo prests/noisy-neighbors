@@ -1,7 +1,9 @@
 package com.github.prests.noisyneighbors.client.ui;
 
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
+import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
+import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import java.util.Comparator;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,6 +17,20 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
   }
 
   @Override protected void addOptions() {
+    net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();
+    WorldIdentity world = WorldIdentity.current(client);
+    net.minecraft.client.gui.components.Button zones = net.minecraft.client.gui.components.Button.builder(
+        Component.translatable("noisy-neighbors.edit-world-zones"), button -> client.setScreenAndShow(new WorldZonesScreen(this, world)))
+        .width(310).build();
+    zones.active = world != null && client.level != null;
+    list.addBig(zones);
+    net.minecraft.client.gui.components.Button create = net.minecraft.client.gui.components.Button.builder(
+        Component.translatable("noisy-neighbors.create-zone"), button -> {
+          ZoneSelection.begin();
+          client.setScreenAndShow(null);
+        }).width(310).build();
+    create.active = zones.active;
+    list.addBig(create);
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .forEach(mob -> list.addBig(new MobSlider(mob)));
   }

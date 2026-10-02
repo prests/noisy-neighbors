@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.UnaryOperator;
 import net.fabricmc.loader.api.FabricLoader;
 
 /** Client-only, sparse settings. Invalid settings are never used. */
@@ -23,6 +25,18 @@ public final class SettingsStore {
 
   private SettingsStore() {}
   public static Data data() { return data; }
+
+  public static void updateZone(String worldKey, UUID zoneId, UnaryOperator<Zone> update) {
+    World world = data.worlds.get(worldKey);
+    if (world == null) return;
+    for (int index = 0; index < world.zones.size(); index++) {
+      Zone zone = world.zones.get(index);
+      if (zone.id().equals(zoneId)) {
+        world.zones.set(index, update.apply(zone));
+        return;
+      }
+    }
+  }
 
   public static void load() {
     if (!Files.exists(FILE)) return;
@@ -57,6 +71,7 @@ public final class SettingsStore {
     int version = 1;
     public Map<String, Integer> global = new HashMap<>();
     public Map<String, World> worlds = new HashMap<>();
+    public boolean showZoneOutlines;
     public void validate() {
       global.entrySet().removeIf(entry -> !valid(entry.getKey(), entry.getValue()));
       worlds.values().forEach(World::validate);

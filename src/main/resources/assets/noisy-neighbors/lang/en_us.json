@@ -1,4 +1,16 @@
 {
   "noisy-neighbors.title": "Advanced Sound Controls",
-  "noisy-neighbors.open": "Advanced Sound Controls"
+  "noisy-neighbors.open": "Advanced Sound Controls",
+  "noisy-neighbors.create-zone": "Create Feather Zone",
+  "noisy-neighbors.edit-world-zones": "Edit World Zones",
+  "noisy-neighbors.zones.title": "%s: World Zones",
+  "noisy-neighbors.zones.empty": "No zones yet — create one with a feather",
+  "noisy-neighbors.zones.outlines.on": "Zone Outlines: On",
+  "noisy-neighbors.zones.outlines.off": "Zone Outlines: Off",
+  "noisy-neighbors.zone.title": "Zone Sound Controls",
+  "noisy-neighbors.selection.first-prompt": "Feather zone: right-click the first corner block (right-click air to cancel)",
+  "noisy-neighbors.selection.second-prompt": "Feather zone: first corner %s, %s, %s; right-click the opposite corner",
+  "noisy-neighbors.selection.first": "Feather zone: first corner set at %s, %s, %s; select the opposite corner",
+  "noisy-neighbors.selection.created": "Feather zone created",
+  "noisy-neighbors.selection.cancelled": "Feather zone selection cancelled"
 }

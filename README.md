@@ -2,6 +2,8 @@
 
 A client-only Fabric mod for personal vanilla-mob sound controls. Open **Options → Music & Sound → Advanced Sound Controls** to set per-mob global volume limits; the settings are stored locally in `config/noisy-neighbors.json`.
 
+To create a zone, choose **Create Feather Zone**, then right-click its two opposite corner blocks with a feather in your main hand. The action bar guides each step; right-click air with the feather to cancel. Choose **Edit World Zones** to list zones for the current world, then select a zone to set its per-mob volume limits. Use **Zone Outlines: On** on that screen to draw visible wireframes around enabled zones in the current dimension.
+
 No server installation is required. Only explicitly catalogued vanilla mob events are changed; player, block, unknown, modded, and mismatched entity sounds remain vanilla. Minecraft cannot distinguish proxy-hosted worlds that share an endpoint and dimension, so those worlds share settings.
 
 ## Compatibility

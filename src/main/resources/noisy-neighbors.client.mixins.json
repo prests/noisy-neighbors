@@ -6,7 +6,8 @@
     "OptionsSubScreenAccessor",
     "SoundOptionsScreenMixin",
     "EntityBoundSoundAccessor",
-    "SoundEngineMixin"
+    "SoundEngineMixin",
+    "GameRendererMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }
