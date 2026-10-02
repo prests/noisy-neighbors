@@ -1,0 +1,123 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '25'
+
+      - name: Read release metadata
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="$(grep -E '^version=' gradle.properties | cut -d= -f2-)"
+          test -n "$version"
+          tag="v$version"
+
+          if git ls-remote --exit-code --refs origin "refs/tags/$tag" >/dev/null; then
+            echo "Tag $tag already exists; refusing to publish a duplicate release." >&2
+            exit 1
+          fi
+
+          git log -1 --format=%b > RELEASE_NOTES.md
+          if ! grep -q '[[:alnum:]]' RELEASE_NOTES.md; then
+            echo "The latest main commit has no release-note body." >&2
+            exit 1
+          fi
+
+          if [[ "$version" == *-beta* ]]; then
+            type=beta
+            prerelease=true
+          else
+            type=release
+            prerelease=false
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "type=$type"
+            echo "prerelease=$prerelease"
+            echo "commit=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and run JVM/server tests
+        run: ./gradlew build
+
+      - name: Install headless OpenGL dependencies
+        run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
+
+      - name: Run production client GameTest
+        env:
+          ALSOFT_DRIVERS: "null"
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
+        run: ./gradlew runProductionClientGameTest
+
+      - name: Create SHA-256 checksum
+        id: artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          jars=(build/libs/*.jar)
+          artifacts=()
+          for jar in "${jars[@]}"; do
+            case "$jar" in
+              *-dev.jar|*-sources.jar|*-javadoc.jar) ;;
+              *) artifacts+=("$jar") ;;
+            esac
+          done
+
+          if [[ ${#artifacts[@]} -ne 1 ]]; then
+            printf 'Expected exactly one distributable JAR; found: %s\n' "${artifacts[*]:-none}" >&2
+            exit 1
+          fi
+
+          jar="${artifacts[0]}"
+          checksum="$jar.sha256"
+          sha256sum "$jar" > "$checksum"
+          echo "jar=$jar" >> "$GITHUB_OUTPUT"
+          echo "checksum=$checksum" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release
+        uses: Kira-NT/mc-publish@v3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-tag: ${{ steps.release.outputs.tag }}
+          github-commitish: ${{ steps.release.outputs.commit }}
+          github-files: |
+            ${{ steps.artifact.outputs.jar }}
+            ${{ steps.artifact.outputs.checksum }}
+          files: ${{ steps.artifact.outputs.jar }}
+          name: Noisy Neighbor ${{ steps.release.outputs.version }}
+          version: ${{ steps.release.outputs.version }}
+          version-type: ${{ steps.release.outputs.type }}
+          changelog-file: RELEASE_NOTES.md
+          github-generate-changelog: false
+          github-prerelease: ${{ steps.release.outputs.prerelease }}
