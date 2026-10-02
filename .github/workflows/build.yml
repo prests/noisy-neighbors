@@ -24,6 +24,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
       - name: Run production client GameTest
         env:
+          ALSOFT_DRIVERS: "null"
           LIBGL_ALWAYS_SOFTWARE: "1"
           MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
         run: ./gradlew runProductionClientGameTest
