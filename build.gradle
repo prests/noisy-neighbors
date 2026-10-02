@@ -26,6 +26,16 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 }
 
+tasks.register("focusedCheck", JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = "com.github.prests.noisyneighbors.client.sound.FocusedCheck"
+	jvmArgs "-ea"
+}
+
+tasks.named("test") {
+	failOnNoDiscoveredTests = false
+}
+
 java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_25

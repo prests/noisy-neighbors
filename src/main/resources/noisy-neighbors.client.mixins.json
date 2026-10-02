@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.github.prests.noisyneighbors.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "OptionsSubScreenAccessor",
+    "SoundOptionsScreenMixin",
+    "EntityBoundSoundAccessor",
+    "SoundEngineMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

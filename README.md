@@ -1,6 +1,8 @@
 # Noisy Neighbor
 
-A Fabric mod for granular Minecraft sound controls. Region-based controls are not implemented yet.
+A client-only Fabric mod for personal vanilla-mob sound controls. Open **Options → Music & Sound → Advanced Sound Controls** to set per-mob global volume limits; the settings are stored locally in `config/noisy-neighbors.json`.
+
+No server installation is required. Only explicitly catalogued vanilla mob events are changed; player, block, unknown, modded, and mismatched entity sounds remain vanilla. Minecraft cannot distinguish proxy-hosted worlds that share an endpoint and dimension, so those worlds share settings.
 
 ## Compatibility
 
@@ -18,6 +20,7 @@ Install JDK 25. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended 
 ```sh
 ./gradlew runClient
 ./gradlew build
+./gradlew focusedCheck
 ```
 
 `runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
