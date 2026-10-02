@@ -32,21 +32,22 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     Button details = Button.builder(Component.literal(zone.name() + " — " + bounds(zone)), button -> {}).width(310).build();
     details.active = false;
     list.addBig(details);
-    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
+    Button rename = Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
         button -> Minecraft.getInstance().gui.setScreen(new ZoneNameScreen(this, worldKey, zoneId, zone.name())))
-        .width(310).build());
-    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.color"),
+        .width(150).build();
+    Button delete = Button.builder(Component.translatable("noisy-neighbors.zone.delete"),
+        button -> confirmDelete(zone)).width(150).build();
+    list.addSmall(rename, delete);
+    Button color = Button.builder(Component.translatable("noisy-neighbors.zone.color"),
         button -> Minecraft.getInstance().gui.setScreen(new ZoneColorScreen(this, worldKey, zoneId, zone.color())))
-        .width(310).build());
+        .width(150).build();
     Button editBounds = Button.builder(Component.translatable("noisy-neighbors.zone.edit-bounds"), button -> {
       ZoneSelection.beginEdit(worldKey, zoneId);
       Minecraft.getInstance().gui.setScreen(null);
-    }).width(310).build();
+    }).width(150).build();
     editBounds.active = Minecraft.getInstance().level != null
         && zone.dimension().equals(Minecraft.getInstance().level.dimension().identifier().toString());
-    list.addBig(editBounds);
-    list.addBig(Button.builder(Component.translatable("noisy-neighbors.zone.delete"),
-        button -> confirmDelete(zone)).width(310).build());
+    list.addSmall(color, editBounds);
     MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
   }
