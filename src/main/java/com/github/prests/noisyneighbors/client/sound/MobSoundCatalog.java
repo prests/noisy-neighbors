@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ public final class MobSoundCatalog {
   private static Map<String, Set<String>> eventToMobs = Map.of();
   private static Map<String, String> sourceAliases = Map.of();
   private static Set<String> mobIds = Set.of();
+  private static Map<String, List<String>> mobVariants = Map.of();
   private static Set<String> sharedEvents = Set.of();
 
   private MobSoundCatalog() {}
@@ -33,10 +35,17 @@ public final class MobSoundCatalog {
       eventToMobs = Collections.unmodifiableMap(reverse);
       sourceAliases = Map.copyOf(catalog.aliases);
       mobIds = Set.copyOf(catalog.mobs.keySet());
+      Map<String, List<String>> variants = new HashMap<>();
+      for (String mob : mobIds) variants.put(mob, new ArrayList<>(List.of(mob)));
+      for (Map.Entry<String, String> alias : sourceAliases.entrySet()) {
+        variants.computeIfAbsent(alias.getValue(), ignored -> new ArrayList<>()).add(alias.getKey());
+      }
+      variants.replaceAll((mob, aliases) -> List.copyOf(aliases));
+      mobVariants = Map.copyOf(variants);
       sharedEvents = Collections.unmodifiableSet(new HashSet<>(catalog.shared));
     } catch (Exception exception) {
       NoisyNeighbors.LOGGER.error("Noisy Neighbor sound catalog is invalid; controls are disabled", exception);
-      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); sharedEvents = Set.of();
+      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); mobVariants = Map.of(); sharedEvents = Set.of();
     }
   }
   public static String mobFor(String eventId, String sourceMobId) {
@@ -53,6 +62,10 @@ public final class MobSoundCatalog {
   }
   public static boolean isKnown(String eventId) { return eventToMobs.containsKey(eventId) || sharedEvents.contains(eventId); }
   public static Set<String> mobs() { return mobIds; }
+  public static List<String> variantsFor(String mob) { return mobVariants.getOrDefault(mob, List.of(mob)); }
+  public static String displayName(String mob) {
+    return String.join("/", variantsFor(mob).stream().map(id -> id.replace("minecraft:", "")).toList());
+  }
   private static final class Catalog {
     Map<String, List<String>> mobs = Map.of();
     Map<String, String> aliases = Map.of();

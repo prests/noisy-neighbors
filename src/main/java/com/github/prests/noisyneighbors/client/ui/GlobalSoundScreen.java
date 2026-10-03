@@ -4,6 +4,7 @@ import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
 import java.util.Comparator;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -40,11 +41,16 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
       updateMessage();
     }
     @Override protected void updateMessage() {
-      String name = mob.equals("minecraft:cow") ? "cow/mooshroom" : mob.replace("minecraft:", "");
-      setMessage(Component.literal(name + ": " + Math.round(value * 100) + "%"));
+      setMessage(Component.literal(MobSoundCatalog.displayName(mob) + ": " + Math.round(value * 100) + "%"));
     }
     @Override protected void applyValue() {
       SettingsStore.data().global.put(mob, (int) Math.round(value * 100));
+    }
+    @Override public void setX(int x) { super.setX(x + MobIcons.WIDTH); }
+    @Override public void setWidth(int width) { super.setWidth(width - MobIcons.WIDTH); }
+    @Override public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+      super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
+      MobIcons.draw(graphics, mob, getX() - MobIcons.WIDTH, getY());
     }
   }
 }

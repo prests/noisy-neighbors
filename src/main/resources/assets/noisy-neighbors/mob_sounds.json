@@ -874,6 +874,135 @@
       "minecraft:entity.ender_dragon.growl",
       "minecraft:entity.ender_dragon.hurt",
       "minecraft:entity.ender_dragon.shoot"
+    ],
+    "minecraft:camel": [
+      "minecraft:entity.camel.ambient",
+      "minecraft:entity.camel.dash",
+      "minecraft:entity.camel.dash_ready",
+      "minecraft:entity.camel.death",
+      "minecraft:entity.camel.eat",
+      "minecraft:entity.camel.hurt",
+      "minecraft:entity.camel.saddle",
+      "minecraft:entity.camel.sit",
+      "minecraft:entity.camel.stand",
+      "minecraft:entity.camel.step",
+      "minecraft:entity.camel.step_sand"
+    ],
+    "minecraft:cod": [
+      "minecraft:entity.cod.ambient",
+      "minecraft:entity.cod.death",
+      "minecraft:entity.cod.flop",
+      "minecraft:entity.cod.hurt"
+    ],
+    "minecraft:dolphin": [
+      "minecraft:entity.dolphin.ambient",
+      "minecraft:entity.dolphin.ambient_water",
+      "minecraft:entity.dolphin.attack",
+      "minecraft:entity.dolphin.death",
+      "minecraft:entity.dolphin.eat",
+      "minecraft:entity.dolphin.hurt",
+      "minecraft:entity.dolphin.jump",
+      "minecraft:entity.dolphin.play",
+      "minecraft:entity.dolphin.splash",
+      "minecraft:entity.dolphin.swim"
+    ],
+    "minecraft:frog": [
+      "minecraft:entity.frog.ambient",
+      "minecraft:entity.frog.death",
+      "minecraft:entity.frog.eat",
+      "minecraft:entity.frog.hurt",
+      "minecraft:entity.frog.lay_spawn",
+      "minecraft:entity.frog.long_jump",
+      "minecraft:entity.frog.step",
+      "minecraft:entity.frog.tongue"
+    ],
+    "minecraft:glow_squid": [
+      "minecraft:entity.glow_squid.ambient",
+      "minecraft:entity.glow_squid.death",
+      "minecraft:entity.glow_squid.hurt",
+      "minecraft:entity.glow_squid.squirt"
+    ],
+    "minecraft:nautilus": [
+      "minecraft:entity.nautilus.ambient",
+      "minecraft:entity.nautilus.ambient_land",
+      "minecraft:entity.nautilus.dash",
+      "minecraft:entity.nautilus.dash_land",
+      "minecraft:entity.nautilus.dash_ready",
+      "minecraft:entity.nautilus.dash_ready_land",
+      "minecraft:entity.nautilus.death",
+      "minecraft:entity.nautilus.death_land",
+      "minecraft:entity.nautilus.eat",
+      "minecraft:entity.nautilus.hurt",
+      "minecraft:entity.nautilus.hurt_land",
+      "minecraft:entity.nautilus.riding",
+      "minecraft:entity.nautilus.swim"
+    ],
+    "minecraft:polar_bear": [
+      "minecraft:entity.polar_bear.ambient",
+      "minecraft:entity.polar_bear.ambient_baby",
+      "minecraft:entity.polar_bear.death",
+      "minecraft:entity.polar_bear.hurt",
+      "minecraft:entity.polar_bear.step",
+      "minecraft:entity.polar_bear.warning"
+    ],
+    "minecraft:pufferfish": [
+      "minecraft:entity.puffer_fish.blow_out",
+      "minecraft:entity.puffer_fish.blow_up",
+      "minecraft:entity.puffer_fish.death",
+      "minecraft:entity.puffer_fish.flop",
+      "minecraft:entity.puffer_fish.hurt",
+      "minecraft:entity.puffer_fish.sting"
+    ],
+    "minecraft:salmon": [
+      "minecraft:entity.salmon.ambient",
+      "minecraft:entity.salmon.death",
+      "minecraft:entity.salmon.flop",
+      "minecraft:entity.salmon.hurt"
+    ],
+    "minecraft:squid": [
+      "minecraft:entity.squid.ambient",
+      "minecraft:entity.squid.death",
+      "minecraft:entity.squid.hurt",
+      "minecraft:entity.squid.squirt"
+    ],
+    "minecraft:tadpole": [
+      "minecraft:entity.tadpole.death",
+      "minecraft:entity.tadpole.flop",
+      "minecraft:entity.tadpole.grow_up",
+      "minecraft:entity.tadpole.hurt"
+    ],
+    "minecraft:tropical_fish": [
+      "minecraft:entity.tropical_fish.ambient",
+      "minecraft:entity.tropical_fish.death",
+      "minecraft:entity.tropical_fish.flop",
+      "minecraft:entity.tropical_fish.hurt"
+    ],
+    "minecraft:wandering_trader": [
+      "minecraft:entity.wandering_trader.ambient",
+      "minecraft:entity.wandering_trader.death",
+      "minecraft:entity.wandering_trader.disappeared",
+      "minecraft:entity.wandering_trader.drink_milk",
+      "minecraft:entity.wandering_trader.drink_potion",
+      "minecraft:entity.wandering_trader.hurt",
+      "minecraft:entity.wandering_trader.no",
+      "minecraft:entity.wandering_trader.reappeared",
+      "minecraft:entity.wandering_trader.trade",
+      "minecraft:entity.wandering_trader.yes"
+    ],
+    "minecraft:wither_skeleton": [
+      "minecraft:entity.wither_skeleton.ambient",
+      "minecraft:entity.wither_skeleton.death",
+      "minecraft:entity.wither_skeleton.hurt",
+      "minecraft:entity.wither_skeleton.step"
+    ],
+    "minecraft:illusioner": [
+      "minecraft:entity.illusioner.ambient",
+      "minecraft:entity.illusioner.cast_spell",
+      "minecraft:entity.illusioner.death",
+      "minecraft:entity.illusioner.hurt",
+      "minecraft:entity.illusioner.mirror_move",
+      "minecraft:entity.illusioner.prepare_blindness",
+      "minecraft:entity.illusioner.prepare_mirror"
     ]
   },
   "shared": [

@@ -99,4 +99,30 @@ class MobSoundCatalogTest {
     assertEquals("minecraft:cow", MobSoundCatalog.mobFor("minecraft:entity.generic.swim", "minecraft:cow"));
     assertNull(MobSoundCatalog.mobFor("minecraft:entity.generic.swim", null));
   }
+
+  @Test void exposesEveryMobCoveredByASharedControl() {
+    assertEquals(java.util.List.of("minecraft:cow", "minecraft:mooshroom"), MobSoundCatalog.variantsFor("minecraft:cow"));
+    assertEquals(java.util.List.of("minecraft:spider", "minecraft:cave_spider"), MobSoundCatalog.variantsFor("minecraft:spider"));
+    assertEquals("cow/mooshroom", MobSoundCatalog.displayName("minecraft:cow"));
+  }
+
+  @Test void mapsEntitySpecificSoundsForAddedCreatures() {
+    Map.ofEntries(
+        Map.entry("minecraft:camel", "minecraft:entity.camel.dash_ready"),
+        Map.entry("minecraft:cod", "minecraft:entity.cod.flop"),
+        Map.entry("minecraft:dolphin", "minecraft:entity.dolphin.play"),
+        Map.entry("minecraft:frog", "minecraft:entity.frog.tongue"),
+        Map.entry("minecraft:glow_squid", "minecraft:entity.glow_squid.squirt"),
+        Map.entry("minecraft:nautilus", "minecraft:entity.nautilus.riding"),
+        Map.entry("minecraft:polar_bear", "minecraft:entity.polar_bear.warning"),
+        Map.entry("minecraft:pufferfish", "minecraft:entity.puffer_fish.sting"),
+        Map.entry("minecraft:salmon", "minecraft:entity.salmon.flop"),
+        Map.entry("minecraft:squid", "minecraft:entity.squid.squirt"),
+        Map.entry("minecraft:tadpole", "minecraft:entity.tadpole.grow_up"),
+        Map.entry("minecraft:tropical_fish", "minecraft:entity.tropical_fish.flop"),
+        Map.entry("minecraft:wandering_trader", "minecraft:entity.wandering_trader.reappeared"),
+        Map.entry("minecraft:wither_skeleton", "minecraft:entity.wither_skeleton.ambient"),
+        Map.entry("minecraft:illusioner", "minecraft:entity.illusioner.prepare_mirror")
+    ).forEach((mob, event) -> assertEquals(mob, MobSoundCatalog.mobFor(event, mob)));
+  }
 }
