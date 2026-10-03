@@ -21,6 +21,7 @@ class VolumePolicyTest {
     data.worlds.put("local:test", world);
 
     assertEquals(.125F, VolumePolicy.multiplier(data, "minecraft:entity.cow.ambient", "minecraft:cow", "local:test", "minecraft:overworld", 1, 1, 1));
+    assertEquals(.125F, VolumePolicy.multiplier(data, "minecraft:entity.cow.ambient", null, "local:test", "minecraft:overworld", 1, 1, 1));
     assertEquals(.25F, VolumePolicy.multiplier(data, "minecraft:entity.cow.ambient", "minecraft:cow", "local:test", "minecraft:overworld", 0, 0, 0));
     assertEquals(1F, VolumePolicy.multiplier(data, "minecraft:entity.cow.ambient", "minecraft:pig", "local:test", "minecraft:overworld", 1, 1, 1));
     assertEquals(1F, VolumePolicy.multiplier(data, "minecraft:block.note_block.harp", null, "local:test", "minecraft:overworld", 1, 1, 1));
