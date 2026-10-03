@@ -94,6 +94,29 @@ class SettingsStoreIntegrationTest {
     assertEquals(preservedId, reloaded.data().worlds.get(world.key()).zones.getFirst().id());
   }
 
+  @Test void preservesSparseFineGrainedValuesAndLoadsExistingVersionOneFiles() throws Exception {
+    Path file = tempDir.resolve("settings.json");
+    Files.writeString(file, "{\"version\":1,\"global\":{\"minecraft:cow\":50},\"worlds\":{}}");
+    SettingsStore.Store store = SettingsStore.at(file);
+    store.load();
+    assertTrue(store.data().events.isEmpty());
+    store.data().events.put("minecraft:cow", new HashMap<>(Map.of(
+        "minecraft:entity.cow.hurt", 25, "minecraft:entity.cow.ambient", 100)));
+    WorldIdentity world = WorldIdentity.local("events", "Events");
+    UUID zoneId = UUID.randomUUID();
+    store.addZone(world, new Zone(zoneId, "Events", true, "minecraft:overworld", 0, 0, 0, 1, 1, 1, Map.of(),
+        Map.of("minecraft:cow", Map.of("minecraft:entity.cow.hurt", 50))));
+    store.save();
+    String saved = Files.readString(file);
+    assertTrue(saved.contains("minecraft:entity.cow.hurt"));
+    assertFalse(saved.contains("minecraft:entity.cow.ambient"));
+
+    SettingsStore.Store reloaded = SettingsStore.at(file);
+    reloaded.load();
+    assertEquals(25, reloaded.data().events.get("minecraft:cow").get("minecraft:entity.cow.hurt"));
+    assertEquals(50, reloaded.data().worlds.get(world.key()).zones.getFirst().events().get("minecraft:cow").get("minecraft:entity.cow.hurt"));
+  }
+
   @Test void ignoresMissingCorruptUnsupportedAndInvalidPersistedData() throws Exception {
     Path file = tempDir.resolve("settings.json");
     SettingsStore.Store missing = SettingsStore.at(file);

@@ -81,7 +81,7 @@ public final class ZoneSelection {
     if (editingZoneId != null) {
       if (!identity.key().equals(editingWorldKey)) return;
       SettingsStore.updateZone(editingWorldKey, editingZoneId, zone -> new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(),
-          level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(), second.getX(), second.getY(), second.getZ(), zone.volumes()));
+          level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(), second.getX(), second.getY(), second.getZ(), zone.volumes(), zone.events()));
     } else {
       int number = SettingsStore.data().worlds.getOrDefault(identity.key(), new SettingsStore.World()).zones.size() + 1;
       SettingsStore.addZone(identity, new Zone(UUID.randomUUID(), "Zone " + number, true,

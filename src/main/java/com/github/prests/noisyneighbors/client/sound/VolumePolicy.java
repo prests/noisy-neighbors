@@ -31,9 +31,12 @@ public final class VolumePolicy {
     String mob = MobSoundCatalog.mobFor(eventId, sourceMobId);
     if (mob == null) return 1F;
     double result = data.global.getOrDefault(mob, 100) / 100.0;
+    result *= data.events.getOrDefault(mob, Map.of()).getOrDefault(eventId, 100) / 100.0;
     SettingsStore.World settings = data.worlds.get(world);
     if (settings != null) for (Zone zone : settings.zones) {
-      if (zone.dimension().equals(dimension) && zone.contains(x, y, z)) result *= zone.multiplier(mob);
+      if (zone.dimension().equals(dimension) && zone.contains(x, y, z)) {
+        result *= zone.multiplier(mob) * zone.eventMultiplier(mob, eventId);
+      }
     }
     return (float) result;
   }

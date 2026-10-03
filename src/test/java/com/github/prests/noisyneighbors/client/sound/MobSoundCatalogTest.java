@@ -106,6 +106,18 @@ class MobSoundCatalogTest {
     assertEquals("cow/mooshroom", MobSoundCatalog.displayName("minecraft:cow"));
   }
 
+  @Test void exposesOnlyDirectFineGrainedEventsInCatalogOrder() {
+    assertEquals(java.util.List.of(
+        "minecraft:entity.llama.ambient", "minecraft:entity.llama.angry", "minecraft:entity.llama.chest",
+        "minecraft:entity.llama.death", "minecraft:entity.llama.eat", "minecraft:entity.llama.hurt",
+        "minecraft:entity.llama.spit", "minecraft:entity.llama.step", "minecraft:entity.llama.swag"),
+        MobSoundCatalog.controllableEventsFor("minecraft:llama"));
+    assertFalse(MobSoundCatalog.controllableEventsFor("minecraft:cow").contains("minecraft:entity.generic.hurt"));
+    assertEquals("minecraft:llama", MobSoundCatalog.mobForSource("minecraft:trader_llama"));
+    assertEquals(java.util.List.of("minecraft:llama", "minecraft:trader_llama"), MobSoundCatalog.variantsFor("minecraft:llama"));
+    assertEquals("llama/trader_llama", MobSoundCatalog.displayName("minecraft:llama"));
+  }
+
   @Test void matchesCanonicalNamesAndSharedControlAliases() {
     assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", ""));
     assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", "zombie"));

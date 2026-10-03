@@ -263,17 +263,6 @@
       "minecraft:entity.llama.step",
       "minecraft:entity.llama.swag"
     ],
-    "minecraft:trader_llama": [
-      "minecraft:entity.llama.ambient",
-      "minecraft:entity.llama.angry",
-      "minecraft:entity.llama.chest",
-      "minecraft:entity.llama.death",
-      "minecraft:entity.llama.eat",
-      "minecraft:entity.llama.hurt",
-      "minecraft:entity.llama.spit",
-      "minecraft:entity.llama.step",
-      "minecraft:entity.llama.swag"
-    ],
     "minecraft:skeleton_horse": [
       "minecraft:entity.skeleton_horse.ambient",
       "minecraft:entity.skeleton_horse.death",
@@ -1015,6 +1004,7 @@
   ],
   "aliases": {
     "minecraft:mooshroom": "minecraft:cow",
-    "minecraft:cave_spider": "minecraft:spider"
+    "minecraft:cave_spider": "minecraft:spider",
+    "minecraft:trader_llama": "minecraft:llama"
   }
 }

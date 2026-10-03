@@ -78,7 +78,7 @@ public final class ZoneColorScreen extends Screen {
 
   private static Zone recolored(Zone zone, int color) {
     return new Zone(zone.id(), zone.name(), zone.enabled(), color, zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
-        zone.maxX(), zone.maxY(), zone.maxZ(), zone.volumes());
+        zone.maxX(), zone.maxY(), zone.maxZ(), zone.volumes(), zone.events());
   }
 
   private final class RgbSlider extends AbstractSliderButton {
