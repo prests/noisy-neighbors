@@ -106,6 +106,17 @@ class MobSoundCatalogTest {
     assertEquals("cow/mooshroom", MobSoundCatalog.displayName("minecraft:cow"));
   }
 
+  @Test void matchesCanonicalNamesAndSharedControlAliases() {
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", ""));
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", "zombie"));
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", "ZoMbIe ViLl"));
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", "zombie_vill"));
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:cow", "moo"));
+    assertTrue(MobSoundCatalog.matchesSearch("minecraft:spider", "cave"));
+    assertFalse(MobSoundCatalog.matchesSearch("minecraft:zombie_villager", "skeleton"));
+    assertFalse(MobSoundCatalog.matchesSearch("minecraft:wandering_trader", "villager"));
+  }
+
   @Test void mapsEntitySpecificSoundsForAddedCreatures() {
     Map.ofEntries(
         Map.entry("minecraft:camel", "minecraft:entity.camel.dash_ready"),

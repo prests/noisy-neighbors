@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,6 +64,16 @@ public final class MobSoundCatalog {
   public static boolean isKnown(String eventId) { return eventToMobs.containsKey(eventId) || sharedEvents.contains(eventId); }
   public static Set<String> mobs() { return mobIds; }
   public static List<String> variantsFor(String mob) { return mobVariants.getOrDefault(mob, List.of(mob)); }
+  public static boolean matchesSearch(String mob, String query) {
+    String names = variantsFor(mob).stream().map(MobSoundCatalog::normalizeSearch).reduce("", (all, name) -> all + " " + name);
+    for (String term : normalizeSearch(query).split("\\s+")) {
+      if (!term.isEmpty() && !names.contains(term)) return false;
+    }
+    return true;
+  }
+  private static String normalizeSearch(String value) {
+    return value.replace("minecraft:", "").replace('_', ' ').toLowerCase(Locale.ROOT);
+  }
   public static String displayName(String mob) {
     return String.join("/", variantsFor(mob).stream().map(id -> id.replace("minecraft:", "")).toList());
   }

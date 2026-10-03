@@ -6,11 +6,14 @@ import com.github.prests.noisyneighbors.client.zone.Zone;
 import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -20,11 +23,19 @@ import net.minecraft.network.chat.Component;
 public final class ZoneSoundScreen extends OptionsSubScreen {
   private final String worldKey;
   private final UUID zoneId;
+  private FilteredOptionsList filteredList;
+  private EditBox search;
 
   public ZoneSoundScreen(Screen parent, String worldKey, UUID zoneId) {
     super(parent, Minecraft.getInstance().options, Component.translatable("noisy-neighbors.zone.title"));
     this.worldKey = worldKey;
     this.zoneId = zoneId;
+  }
+
+  @Override protected void addContents() {
+    filteredList = (FilteredOptionsList) layout.addToContents(new FilteredOptionsList(Minecraft.getInstance(), width, this));
+    list = filteredList;
+    addOptions();
   }
 
   @Override protected void addOptions() {
@@ -49,8 +60,26 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     editBounds.active = Minecraft.getInstance().level != null
         && zone.dimension().equals(Minecraft.getInstance().level.dimension().identifier().toString());
     list.addSmall(color, editBounds);
-    MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
-        .forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
+    search = new EditBox(font, 0, 0, 310, 20, Component.translatable("noisy-neighbors.search.entities"));
+    search.setHint(Component.translatable("noisy-neighbors.search.entities").withStyle(EditBox.SEARCH_HINT_STYLE));
+    search.setResponder(query -> refreshOptions());
+    list.addBig(search);
+    filteredList.rememberEntries();
+    refreshOptions();
+  }
+
+  private void refreshOptions() {
+    filteredList.showFixedEntries();
+    Zone zone = zone();
+    List<String> mobs = zone == null ? List.of() : MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
+        .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
+    mobs.forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
+    if (mobs.isEmpty()) {
+      Button empty = Button.builder(Component.translatable("noisy-neighbors.search.empty"), button -> {}).width(310).build();
+      empty.active = false;
+      list.addBig(empty);
+    }
+    list.setScrollAmount(0);
   }
 
   @Override public void onClose() {
@@ -85,6 +114,22 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
   private static String bounds(Zone zone) {
     return zone.minX() + "," + zone.minY() + "," + zone.minZ() + " → "
         + zone.maxX() + "," + zone.maxY() + "," + zone.maxZ();
+  }
+
+  private static final class FilteredOptionsList extends OptionsList {
+    private List<AbstractEntry> fixedEntries = List.of();
+
+    FilteredOptionsList(Minecraft minecraft, int width, OptionsSubScreen screen) {
+      super(minecraft, width, screen);
+    }
+
+    void rememberEntries() {
+      fixedEntries = List.copyOf(children());
+    }
+
+    void showFixedEntries() {
+      replaceEntries(fixedEntries);
+    }
   }
 
   private final class MobSlider extends AbstractSliderButton {
