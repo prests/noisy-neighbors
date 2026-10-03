@@ -8,12 +8,15 @@ import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 /** Full-width entity row with an icon, slider, and separately focusable advanced button. */
 class EntityOptionsList extends OptionsList {
   private static final int ROW_WIDTH = 310;
   private static final int BUTTON_WIDTH = 20;
   private static final int GAP = MobIcons.WIDTH - 20;
+  static final Component ADVANCED_LABEL = Component.literal("⚙").withStyle(ChatFormatting.BOLD);
   private final OptionsSubScreen screen;
 
   EntityOptionsList(Minecraft minecraft, int width, OptionsSubScreen screen) {

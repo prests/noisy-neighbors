@@ -59,7 +59,7 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
     java.util.List<String> mobs = MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
     mobs.forEach(mob -> {
-      Button advanced = Button.builder(Component.literal("⚙"), button ->
+      Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL, button ->
           net.minecraft.client.Minecraft.getInstance().gui.setScreen(new FineGrainedSoundScreen(this, mob))).width(20).build();
       advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
       entityList.addEntity(new MobSlider(mob), advanced);

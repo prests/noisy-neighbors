@@ -75,7 +75,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     List<String> mobs = zone == null ? List.of() : MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
     mobs.forEach(mob -> {
-      Button advanced = Button.builder(Component.literal("⚙"), button -> Minecraft.getInstance().gui.setScreen(
+      Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL, button -> Minecraft.getInstance().gui.setScreen(
           new FineGrainedSoundScreen(this, worldKey, zoneId, mob))).width(20).build();
       advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
       filteredList.addEntity(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100)), advanced);
