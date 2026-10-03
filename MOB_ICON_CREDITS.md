@@ -1,0 +1,1 @@
+`src/main/resources/assets/noisy-neighbors/textures/gui/mob_icons.png` is the 16×16 sprite sheet from [Simplexity-Development/Entity-Icons](https://github.com/Simplexity-Development/Entity-Icons), released under CC0-1.0.

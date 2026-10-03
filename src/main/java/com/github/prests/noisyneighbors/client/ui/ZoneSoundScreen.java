@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -96,7 +97,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     }
 
     @Override protected void updateMessage() {
-      setMessage(Component.literal(mob.replace("minecraft:", "") + ": " + Math.round(value * 100) + "%"));
+      setMessage(Component.literal(MobSoundCatalog.displayName(mob) + ": " + Math.round(value * 100) + "%"));
     }
 
     @Override protected void applyValue() {
@@ -107,6 +108,13 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
         return new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(), zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
             zone.maxX(), zone.maxY(), zone.maxZ(), volumes);
       });
+    }
+
+    @Override public void setX(int x) { super.setX(x + MobIcons.WIDTH); }
+    @Override public void setWidth(int width) { super.setWidth(width - MobIcons.WIDTH); }
+    @Override public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+      super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
+      MobIcons.draw(graphics, mob, getX() - MobIcons.WIDTH, getY());
     }
   }
 }
