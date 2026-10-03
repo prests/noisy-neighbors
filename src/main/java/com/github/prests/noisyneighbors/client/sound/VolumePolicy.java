@@ -13,14 +13,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public final class VolumePolicy {
   private VolumePolicy() {}
   public static float multiplier(String eventId, Entity source, double x, double y, double z) {
-    String sourceMob = null;
-    if (source != null) {
-      if (!(source instanceof LivingEntity) || source instanceof Player) return 1F;
-      sourceMob = BuiltInRegistries.ENTITY_TYPE.getKey(source.getType()).toString();
-      if (!MobSoundCatalog.mobs().contains(sourceMob)) return 1F;
-    }
     Minecraft client = Minecraft.getInstance();
     if (client.level == null) return 1F;
+    String sourceMob = source == null ? null : mobId(source);
+    if (source != null && sourceMob == null) return 1F;
     WorldIdentity world = WorldIdentity.current(client);
     if (world == null) return 1F;
     return multiplier(eventId, sourceMob, world.key(), client.level.dimension().identifier().toString(), x, y, z);
@@ -40,6 +36,11 @@ public final class VolumePolicy {
       if (zone.dimension().equals(dimension) && zone.contains(x, y, z)) result *= zone.multiplier(mob);
     }
     return (float) result;
+  }
+
+  private static String mobId(Entity entity) {
+    if (!(entity instanceof LivingEntity) || entity instanceof Player) return null;
+    return MobSoundCatalog.mobForSource(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
   }
 
   public static float apply(float originalVolume, float multiplier) {

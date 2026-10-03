@@ -40,7 +40,8 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
       updateMessage();
     }
     @Override protected void updateMessage() {
-      setMessage(Component.literal(mob.replace("minecraft:", "") + ": " + Math.round(value * 100) + "%"));
+      String name = mob.equals("minecraft:cow") ? "cow/mooshroom" : mob.replace("minecraft:", "");
+      setMessage(Component.literal(name + ": " + Math.round(value * 100) + "%"));
     }
     @Override protected void applyValue() {
       SettingsStore.data().global.put(mob, (int) Math.round(value * 100));
