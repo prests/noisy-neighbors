@@ -27,6 +27,19 @@ class VolumePolicyTest {
     assertEquals(1F, VolumePolicy.multiplier(data, "minecraft:block.note_block.harp", null, "local:test", "minecraft:overworld", 1, 1, 1));
   }
 
+  @Test void multipliesGlobalAndZoneEventControlsOnlyForTheMatchingEvent() {
+    SettingsStore.Data data = new SettingsStore.Data();
+    data.global.put("minecraft:cow", 50);
+    data.events.put("minecraft:cow", Map.of("minecraft:entity.cow.hurt", 80));
+    SettingsStore.World world = new SettingsStore.World();
+    world.zones.add(new Zone(UUID.randomUUID(), "Zone", true, "minecraft:overworld", 0, 0, 0, 1, 1, 1,
+        Map.of("minecraft:cow", 50), Map.of("minecraft:cow", Map.of("minecraft:entity.cow.hurt", 25))));
+    data.worlds.put("local:test", world);
+
+    assertEquals(.05F, VolumePolicy.multiplier(data, "minecraft:entity.cow.hurt", "minecraft:cow", "local:test", "minecraft:overworld", 0, 0, 0));
+    assertEquals(.25F, VolumePolicy.multiplier(data, "minecraft:entity.cow.ambient", "minecraft:cow", "local:test", "minecraft:overworld", 0, 0, 0));
+  }
+
   @Test void ignoresDisabledOrForeignZonesAndAppliesTheOriginalVolumeOnce() {
     SettingsStore.Data data = new SettingsStore.Data();
     SettingsStore.World world = new SettingsStore.World();

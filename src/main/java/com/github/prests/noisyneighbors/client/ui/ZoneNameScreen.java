@@ -49,6 +49,6 @@ public final class ZoneNameScreen extends Screen {
 
   private static Zone renamed(Zone zone, String name) {
     return new Zone(zone.id(), name, zone.enabled(), zone.color(), zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
-        zone.maxX(), zone.maxY(), zone.maxZ(), zone.volumes());
+        zone.maxX(), zone.maxY(), zone.maxZ(), zone.volumes(), zone.events());
   }
 }

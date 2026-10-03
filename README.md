@@ -15,8 +15,9 @@ Noisy Neighbor is client-side only: install it on your client and use it in sing
 1. Open **Options → Music & Sound → Advanced Sound Controls**.
 2. Use the sliders to set a volume for each mob.
 3. Set a mob to **0%** to mute it everywhere, or choose a lower volume to keep it in the background.
+4. Select the **⚙ Advanced Controls** button beside a mob to adjust its individual sound events.
 
-These controls are a great default when a particular creature is always too loud.
+These controls are a great default when a particular creature is always too loud. Event controls multiply the mob control, and zone mob/event controls multiply again for every matching zone.
 
 ## Create a sound zone
 
@@ -25,7 +26,7 @@ Use a zone when you only want quieter sounds in one place, such as an animal far
 1. Open **Edit World Zones**.
 2. Select **Create Zone**.
 3. Right-click two opposite corner blocks to mark the zone's bounds. The action bar guides you through the selection.
-4. Open the new zone to adjust each mob's volume.
+4. Open the new zone to adjust each mob's volume, or use its **⚙ Advanced Controls** button for individual events.
 
 Press your configured **Create Zone** key again to cancel while choosing corners.
 

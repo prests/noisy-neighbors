@@ -2,6 +2,7 @@ package com.github.prests.noisyneighbors.client.config;
 
 import com.github.prests.noisyneighbors.NoisyNeighbors;
 import com.github.prests.noisyneighbors.client.zone.Zone;
+import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
@@ -114,10 +115,17 @@ public final class SettingsStore {
   public static final class Data {
     int version = 1;
     public Map<String, Integer> global = new HashMap<>();
+    /** Sparse canonical entity/event percentages. */
+    public Map<String, Map<String, Integer>> events = new HashMap<>();
     public Map<String, World> worlds = new HashMap<>();
     public boolean showZoneOutlines;
     public void validate() {
+      if (global == null) global = new HashMap<>();
+      if (events == null) events = new HashMap<>();
+      if (worlds == null) worlds = new HashMap<>();
       global.entrySet().removeIf(entry -> !valid(entry.getKey(), entry.getValue()));
+      normalizeEvents(events);
+      worlds.values().removeIf(java.util.Objects::isNull);
       worlds.values().forEach(World::validate);
     }
   }
@@ -125,7 +133,26 @@ public final class SettingsStore {
   public static final class World {
     public String displayName = "World";
     public List<Zone> zones = new ArrayList<>();
-    void validate() { zones.removeIf(zone -> zone == null || !zone.volumes().entrySet().stream().allMatch(e -> valid(e.getKey(), e.getValue()))); }
+    void validate() {
+      if (zones == null) zones = new ArrayList<>();
+      zones.removeIf(zone -> zone == null || !zone.volumes().entrySet().stream().allMatch(e -> valid(e.getKey(), e.getValue())));
+      for (int index = 0; index < zones.size(); index++) {
+        Zone zone = zones.get(index);
+        Map<String, Map<String, Integer>> events = new HashMap<>(zone.events());
+        normalizeEvents(events);
+        if (!events.equals(zone.events())) zones.set(index, new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(),
+            zone.dimension(), zone.minX(), zone.minY(), zone.minZ(), zone.maxX(), zone.maxY(), zone.maxZ(), zone.volumes(), events));
+      }
+    }
+  }
+
+  private static void normalizeEvents(Map<String, Map<String, Integer>> events) {
+    events.entrySet().removeIf(entry -> entry.getKey() == null || !MobSoundCatalog.mobs().contains(entry.getKey())
+        || entry.getValue() == null);
+    events.replaceAll((mob, values) -> new HashMap<>(values));
+    events.forEach((mob, values) -> values.entrySet().removeIf(entry -> !valid(entry.getKey(), entry.getValue())
+        || !MobSoundCatalog.controllableEventsFor(mob).contains(entry.getKey()) || entry.getValue() == 100));
+    events.entrySet().removeIf(entry -> entry.getValue().isEmpty());
   }
 
   private static boolean valid(String id, Integer value) {

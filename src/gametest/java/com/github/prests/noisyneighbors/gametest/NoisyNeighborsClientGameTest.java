@@ -3,6 +3,7 @@ package com.github.prests.noisyneighbors.gametest;
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
+import com.github.prests.noisyneighbors.client.ui.FineGrainedSoundScreen;
 import com.github.prests.noisyneighbors.client.ui.GlobalSoundScreen;
 import com.github.prests.noisyneighbors.client.ui.ZoneSoundScreen;
 import com.github.prests.noisyneighbors.client.zone.Zone;
@@ -40,6 +41,7 @@ public final class NoisyNeighborsClientGameTest implements FabricClientGameTest 
       }
       context.runOnClient(NoisyNeighborsClientGameTest::verifySoundMixinCapturesConfiguredVolume);
       context.runOnClient(NoisyNeighborsClientGameTest::verifyEntitySearchFiltersBothMenus);
+      context.runOnClient(NoisyNeighborsClientGameTest::verifyFineGrainedScreens);
     }
   }
 
@@ -78,6 +80,14 @@ public final class NoisyNeighborsClientGameTest implements FabricClientGameTest 
     } finally {
       SettingsStore.removeZone(world.key(), zoneId);
       client.gui.setScreen(null);
+    }
+  }
+
+  private static void verifyFineGrainedScreens(Minecraft client) {
+    FineGrainedSoundScreen global = new FineGrainedSoundScreen(null, "minecraft:cow");
+    client.gui.setScreen(global);
+    if (!sliderLabels(((OptionsSubScreenAccessor) (Object) global).noisyNeighbors$list()).contains("minecraft:entity.cow.hurt: 100%")) {
+      throw new AssertionError("global advanced controls did not render exact event IDs");
     }
   }
 

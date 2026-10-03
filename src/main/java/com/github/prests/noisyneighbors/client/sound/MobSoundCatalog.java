@@ -22,6 +22,7 @@ public final class MobSoundCatalog {
   private static Set<String> mobIds = Set.of();
   private static Map<String, List<String>> mobVariants = Map.of();
   private static Set<String> sharedEvents = Set.of();
+  private static Map<String, List<String>> controllableEvents = Map.of();
 
   private MobSoundCatalog() {}
   public static void load() {
@@ -44,9 +45,16 @@ public final class MobSoundCatalog {
       variants.replaceAll((mob, aliases) -> List.copyOf(aliases));
       mobVariants = Map.copyOf(variants);
       sharedEvents = Collections.unmodifiableSet(new HashSet<>(catalog.shared));
+      Map<String, List<String>> controls = new HashMap<>();
+      for (Map.Entry<String, List<String>> entry : catalog.mobs.entrySet()) {
+        controls.put(entry.getKey(), entry.getValue().stream()
+            .filter(event -> reverse.getOrDefault(event, Set.of()).equals(Set.of(entry.getKey())))
+            .toList());
+      }
+      controllableEvents = Map.copyOf(controls);
     } catch (Exception exception) {
       NoisyNeighbors.LOGGER.error("Noisy Neighbor sound catalog is invalid; controls are disabled", exception);
-      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); mobVariants = Map.of(); sharedEvents = Set.of();
+      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); mobVariants = Map.of(); sharedEvents = Set.of(); controllableEvents = Map.of();
     }
   }
   public static String mobFor(String eventId, String sourceMobId) {
@@ -64,6 +72,8 @@ public final class MobSoundCatalog {
   public static boolean isKnown(String eventId) { return eventToMobs.containsKey(eventId) || sharedEvents.contains(eventId); }
   public static Set<String> mobs() { return mobIds; }
   public static List<String> variantsFor(String mob) { return mobVariants.getOrDefault(mob, List.of(mob)); }
+  /** Events that can identify this canonical group without source-entity metadata. */
+  public static List<String> controllableEventsFor(String mob) { return controllableEvents.getOrDefault(mob, List.of()); }
   public static boolean matchesSearch(String mob, String query) {
     String names = variantsFor(mob).stream().map(MobSoundCatalog::normalizeSearch).reduce("", (all, name) -> all + " " + name);
     for (String term : normalizeSearch(query).split("\\s+")) {

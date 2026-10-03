@@ -12,8 +12,8 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 
 public final class NoisyNeighborsClient implements ClientModInitializer {
   @Override public void onInitializeClient() {
-    SettingsStore.load();
     MobSoundCatalog.load();
+    SettingsStore.load();
     NoisyNeighborsKeyMappings.register();
     ZoneOutlines.register();
     UseBlockCallback.EVENT.register(ZoneSelection::useBlock);

@@ -25,4 +25,12 @@ class ZoneTest {
     assertEquals(1, enabled.multiplier("minecraft:pig"));
     assertEquals(1, disabled.multiplier("minecraft:cow"));
   }
+
+  @Test void appliesSparseEventVolumeOnlyWhenEnabled() {
+    Zone zone = new Zone(UUID.randomUUID(), "Quiet", true, "minecraft:overworld", 0, 0, 0, 1, 1, 1, Map.of(),
+        Map.of("minecraft:cow", Map.of("minecraft:entity.cow.hurt", 25)));
+
+    assertEquals(.25, zone.eventMultiplier("minecraft:cow", "minecraft:entity.cow.hurt"));
+    assertEquals(1, zone.eventMultiplier("minecraft:cow", "minecraft:entity.cow.ambient"));
+  }
 }

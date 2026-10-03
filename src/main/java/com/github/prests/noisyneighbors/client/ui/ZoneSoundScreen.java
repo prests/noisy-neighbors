@@ -14,6 +14,7 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.OptionsList;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -73,7 +74,12 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
     Zone zone = zone();
     List<String> mobs = zone == null ? List.of() : MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
-    mobs.forEach(mob -> list.addBig(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100))));
+    mobs.forEach(mob -> {
+      Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL, button -> Minecraft.getInstance().gui.setScreen(
+          new FineGrainedSoundScreen(this, worldKey, zoneId, mob))).width(20).build();
+      advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
+      filteredList.addEntity(new MobSlider(mob, zone.volumes().getOrDefault(mob, 100)), advanced);
+    });
     if (mobs.isEmpty()) {
       Button empty = Button.builder(Component.translatable("noisy-neighbors.search.empty"), button -> {}).width(310).build();
       empty.active = false;
@@ -116,7 +122,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
         + zone.maxX() + "," + zone.maxY() + "," + zone.maxZ();
   }
 
-  private static final class FilteredOptionsList extends OptionsList {
+  private static final class FilteredOptionsList extends EntityOptionsList {
     private List<AbstractEntry> fixedEntries = List.of();
 
     FilteredOptionsList(Minecraft minecraft, int width, OptionsSubScreen screen) {
@@ -151,7 +157,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
         var volumes = new HashMap<>(zone.volumes());
         volumes.put(mob, volume);
         return new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(), zone.dimension(), zone.minX(), zone.minY(), zone.minZ(),
-            zone.maxX(), zone.maxY(), zone.maxZ(), volumes);
+            zone.maxX(), zone.maxY(), zone.maxZ(), volumes, zone.events());
       });
     }
 

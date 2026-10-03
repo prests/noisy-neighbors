@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 /** Uses Minecraft's options list so rows remain keyboard and mouse scrollable. */
 public final class GlobalSoundScreen extends OptionsSubScreen {
   private EditBox search;
+  private EntityOptionsList entityList;
 
   public GlobalSoundScreen(Screen parent) {
     super(parent, net.minecraft.client.Minecraft.getInstance().options, Component.translatable("noisy-neighbors.title"));
@@ -41,6 +43,13 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
     layout.addToHeader(header);
   }
 
+  @Override protected void addContents() {
+    entityList = (EntityOptionsList) layout.addToContents(new EntityOptionsList(
+        net.minecraft.client.Minecraft.getInstance(), width, this));
+    list = entityList;
+    addOptions();
+  }
+
   @Override protected void addOptions() {
     refreshOptions();
   }
@@ -49,7 +58,12 @@ public final class GlobalSoundScreen extends OptionsSubScreen {
     list.replaceEntries(java.util.List.of());
     java.util.List<String> mobs = MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
         .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
-    mobs.forEach(mob -> list.addBig(new MobSlider(mob)));
+    mobs.forEach(mob -> {
+      Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL, button ->
+          net.minecraft.client.Minecraft.getInstance().gui.setScreen(new FineGrainedSoundScreen(this, mob))).width(20).build();
+      advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
+      entityList.addEntity(new MobSlider(mob), advanced);
+    });
     if (mobs.isEmpty()) {
       Button empty = Button.builder(Component.translatable("noisy-neighbors.search.empty"), button -> {}).width(310).build();
       empty.active = false;

@@ -6,6 +6,8 @@ import com.github.prests.noisyneighbors.client.zone.Zone;
 import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
@@ -20,18 +22,27 @@ public final class WorldZonesScreen extends OptionsSubScreen {
     this.world = world;
   }
 
-  @Override protected void addOptions() {
+  @Override protected void addTitle() {
+    layout.setHeaderHeight(58);
     outlines = Button.builder(Component.empty(), button -> {
       SettingsStore.data().showZoneOutlines = !SettingsStore.data().showZoneOutlines;
       updateOutlineLabel();
-    }).width(310).build();
+    }).width(150).build();
     updateOutlineLabel();
-    list.addBig(outlines);
-    list.addBig(Button.builder(Component.translatable("noisy-neighbors.create-zone"), button -> {
+    Button create = Button.builder(Component.translatable("noisy-neighbors.create-zone"), button -> {
       ZoneSelection.begin();
       Minecraft.getInstance().gui.setScreen(null);
-    }).width(310).build());
+    }).width(150).build();
+    LinearLayout row = LinearLayout.horizontal().spacing(10);
+    row.addChild(outlines);
+    row.addChild(create);
+    LinearLayout header = LinearLayout.vertical().spacing(4);
+    header.addChild(new StringWidget(title, font), settings -> settings.alignHorizontallyCenter());
+    header.addChild(row);
+    layout.addToHeader(header);
+  }
 
+  @Override protected void addOptions() {
     SettingsStore.World settings = SettingsStore.data().worlds.get(world.key());
     if (settings == null || settings.zones.isEmpty()) {
       Button empty = Button.builder(Component.translatable("noisy-neighbors.zones.empty"), button -> {}).width(310).build();
