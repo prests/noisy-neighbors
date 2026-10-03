@@ -6,6 +6,8 @@
   "key.noisy-neighbors.create_zone": "Create Zone",
   "noisy-neighbors.create-zone": "Create Zone",
   "noisy-neighbors.edit-world-zones": "Edit World Zones",
+  "noisy-neighbors.search.entities": "Search entities",
+  "noisy-neighbors.search.empty": "No entities found",
   "noisy-neighbors.zones.title": "%s: World Zones",
   "noisy-neighbors.zones.empty": "No zones yet — create one",
   "noisy-neighbors.zones.outlines.on": "Zone Outlines: On",
