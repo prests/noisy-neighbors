@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "noisy-neighbors-test",
+  "version": "1.0.0",
+  "name": "Noisy Neighbors Game Tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "com.github.prests.noisyneighbors.gametest.NoisyNeighborsClientGameTest"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "fabric-api": "*"
+  }
+}
