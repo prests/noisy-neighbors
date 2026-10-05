@@ -1,0 +1,36 @@
+name: Apply repository settings
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/settings.yml]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Check reports drift; apply updates GitHub settings.
+        required: true
+        default: check
+        type: choice
+        options: [check, apply]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-settings
+  cancel-in-progress: false
+
+jobs:
+  settings:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Apply repository settings
+        uses: Vivswan/github-settings-as-code@v2
+        with:
+          token: ${{ secrets.ADMIN_TOKEN }}
+          mode: ${{ inputs.mode || 'apply' }}
+          on-missing-permission: fail
