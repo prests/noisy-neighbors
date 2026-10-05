@@ -1,0 +1,65 @@
+repository:
+  has_wiki: false
+  has_projects: false
+  has_discussions: false
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  squash_merge_commit_title: PR_TITLE
+  squash_merge_commit_message: PR_BODY
+  allow_update_branch: true
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+  enable_vulnerability_alerts: true
+  enable_automated_security_fixes: true
+
+actions:
+  enabled: true
+  allowed_actions: selected
+  selected_actions:
+    github_owned_allowed: true
+    verified_allowed: false
+    patterns_allowed:
+      - Vivswan/github-settings-as-code@*
+      - gradle/actions@*
+      - Kira-NT/mc-publish@*
+  default_workflow_permissions: read
+  can_approve_pull_request_reviews: false
+
+environments:
+  - name: release
+    deployment_branch_policy:
+      protected_branches: true
+      custom_branch_policies: false
+
+rulesets:
+  - name: protected release branches
+    target: branch
+    enforcement: active
+    conditions:
+      ref_name:
+        include:
+          - ~DEFAULT_BRANCH
+          - lts-mc*
+        exclude: []
+    rules:
+      - type: deletion
+      - type: non_fast_forward
+      - type: required_linear_history
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: true
+          do_not_enforce_on_create: false
+          required_status_checks:
+            - context: build
+      - type: pull_request
+        parameters:
+          required_approving_review_count: 1
+          dismiss_stale_reviews_on_push: true
+          require_code_owner_review: true
+          require_last_push_approval: false
+          required_review_thread_resolution: true
+    bypass_actors:
+      - actor_id: 5
+        actor_type: RepositoryRole
+        bypass_mode: always

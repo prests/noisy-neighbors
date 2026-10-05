@@ -4,17 +4,24 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      commit: ${{ steps.release.outputs.commit }}
+      version: ${{ steps.release.outputs.version }}
+      type: ${{ steps.release.outputs.type }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
     steps:
       - name: Check out main
         uses: actions/checkout@v6
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v6
@@ -79,7 +86,6 @@ jobs:
         run: ./gradlew runProductionClientGameTest
 
       - name: Create SHA-256 checksum
-        id: artifact
         shell: bash
         run: |
           set -euo pipefail
@@ -98,11 +104,30 @@ jobs:
             exit 1
           fi
 
-          jar="${artifacts[0]}"
-          checksum="$jar.sha256"
-          sha256sum "$jar" > "$checksum"
-          echo "jar=$jar" >> "$GITHUB_OUTPUT"
-          echo "checksum=$checksum" >> "$GITHUB_OUTPUT"
+          mkdir release
+          cp "${artifacts[0]}" release/release.jar
+          sha256sum release/release.jar > release/release.jar.sha256
+          cp RELEASE_NOTES.md release/
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          if-no-files-found: error
+          path: release/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release
 
       - name: Publish release
         uses: Kira-NT/mc-publish@v3
@@ -112,15 +137,15 @@ jobs:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-tag: ${{ steps.release.outputs.tag }}
-          github-commitish: ${{ steps.release.outputs.commit }}
+          github-tag: ${{ needs.build.outputs.tag }}
+          github-commitish: ${{ needs.build.outputs.commit }}
           github-files: |
-            ${{ steps.artifact.outputs.jar }}
-            ${{ steps.artifact.outputs.checksum }}
-          files: ${{ steps.artifact.outputs.jar }}
-          name: Noisy Neighbors ${{ steps.release.outputs.version }}
-          version: ${{ steps.release.outputs.version }}
-          version-type: ${{ steps.release.outputs.type }}
-          changelog-file: RELEASE_NOTES.md
+            release/release.jar
+            release/release.jar.sha256
+          files: release/release.jar
+          name: Noisy Neighbors ${{ needs.build.outputs.version }}
+          version: ${{ needs.build.outputs.version }}
+          version-type: ${{ needs.build.outputs.type }}
+          changelog-file: release/RELEASE_NOTES.md
           github-generate-changelog: false
-          github-prerelease: ${{ steps.release.outputs.prerelease }}
+          github-prerelease: ${{ needs.build.outputs.prerelease }}
