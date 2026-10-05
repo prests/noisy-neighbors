@@ -1,7 +1,7 @@
 <p align="center">
   <img src="src/main/resources/assets/noisy-neighbors/icon.png" alt="Noisy Neighbors logo" height="250" style="border-radius: 16px;"><br>
   <a href="https://rootapp.gg/ADGsp7WhhQq3rTIL0m_mXg"><img src="branding/root-join-button.svg" alt="Root Community join button" height="112"></a><br>
-  <a href="https://modrinth.com/mod/noisy-neighbors"><img alt="Modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a> <a href="https://www.curseforge.com/minecraft/mc-mods/noisy-neighbors/preview"><img alt="CurseForge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg"></a>
+  <a href="https://modrinth.com/mod/noisy-neighbors"><img alt="Modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a> <a href="https://www.curseforge.com/minecraft/mc-mods/noisy-neighbors"><img alt="CurseForge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg"></a>
 </p>
 
 # Noisy Neighbors
