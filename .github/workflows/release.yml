@@ -32,8 +32,11 @@ jobs:
           set -euo pipefail
 
           version="$(grep -E '^version=' gradle.properties | cut -d= -f2-)"
+          minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2-)"
           test -n "$version"
-          tag="v$version"
+          test -n "$minecraft_version"
+          release_version="v$version-mc$minecraft_version-fabric"
+          tag="$release_version"
 
           if git ls-remote --exit-code --refs origin "refs/tags/$tag" >/dev/null; then
             echo "Tag $tag already exists; refusing to publish a duplicate release." >&2
@@ -55,7 +58,7 @@ jobs:
           fi
 
           {
-            echo "version=$version"
+            echo "version=$release_version"
             echo "tag=$tag"
             echo "type=$type"
             echo "prerelease=$prerelease"
