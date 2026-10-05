@@ -5,9 +5,9 @@ Thanks for helping improve Noisy Neighbors.
 ## Compatibility
 
 - Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5 or later
+- Fabric Loader 0.19.3 or later
 - Java 25
-- Fabric API 0.161.0+26.3
+- Fabric API 0.160.6 or newer
 
 Fabric is the only supported loader.
 
