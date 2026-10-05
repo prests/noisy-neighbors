@@ -80,8 +80,8 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 ## Requirements
 
 - Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5 or newer
-- Fabric API
+- Fabric Loader 0.19.3 or newer
+- Fabric API 0.160.6 or newer
 - Java 25 or newer
 
 ## License
