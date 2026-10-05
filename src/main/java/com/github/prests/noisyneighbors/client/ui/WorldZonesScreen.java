@@ -7,6 +7,7 @@ import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
@@ -42,6 +43,11 @@ public final class WorldZonesScreen extends OptionsSubScreen {
     layout.addToHeader(header);
   }
 
+  @Override protected void addContents() {
+    list = (ZoneOptionsList) layout.addToContents(new ZoneOptionsList(Minecraft.getInstance(), width, this));
+    addOptions();
+  }
+
   @Override protected void addOptions() {
     SettingsStore.World settings = SettingsStore.data().worlds.get(world.key());
     if (settings == null || settings.zones.isEmpty()) {
@@ -51,11 +57,41 @@ public final class WorldZonesScreen extends OptionsSubScreen {
       return;
     }
 
-    for (Zone zone : settings.zones) {
-      list.addBig(Button.builder(Component.literal(zone.name() + " — " + zone.dimension().replace("minecraft:", "")),
-          button -> Minecraft.getInstance().gui.setScreen(new ZoneSoundScreen(new WorldZonesScreen(lastScreen, world), world.key(), zone.id())))
-          .width(310).build());
-    }
+    ZoneOptionsList zones = (ZoneOptionsList) list;
+    for (Zone zone : settings.zones) zones.addZone(createZoneSelector(zone), createZoneToggle(zone));
+  }
+
+  private Button createZoneSelector(Zone zone) {
+    return Button.builder(Component.literal(zone.name() + " — " + zone.dimension().replace("minecraft:", "")),
+        button -> Minecraft.getInstance().gui.setScreen(new ZoneSoundScreen(new WorldZonesScreen(lastScreen, world), world.key(), zone.id())))
+        .build();
+  }
+
+  private Button createZoneToggle(Zone zone) {
+    Button toggle = Button.builder(zoneLabel(zone.enabled()), button -> {
+      boolean enabled = !zoneEnabled(zone.id());
+      SettingsStore.updateZone(world.key(), zone.id(), current -> new Zone(current.id(), current.name(), enabled, current.color(),
+          current.dimension(), current.minX(), current.minY(), current.minZ(), current.maxX(), current.maxY(), current.maxZ(),
+          current.volumes(), current.events(), current.chattiness()));
+      button.setMessage(zoneLabel(enabled));
+      button.setTooltip(zoneTooltip(enabled));
+    }).build();
+    toggle.setTooltip(zoneTooltip(zone.enabled()));
+    return toggle;
+  }
+
+  private boolean zoneEnabled(java.util.UUID zoneId) {
+    SettingsStore.World settings = SettingsStore.data().worlds.get(world.key());
+    return settings != null && settings.zones.stream().filter(zone -> zone.id().equals(zoneId)).findFirst()
+        .map(Zone::enabled).orElse(false);
+  }
+
+  private static Tooltip zoneTooltip(boolean enabled) {
+    return Tooltip.create(Component.translatable(enabled ? "noisy-neighbors.zone.disable" : "noisy-neighbors.zone.enable"));
+  }
+
+  private static Component zoneLabel(boolean enabled) {
+    return Component.literal(enabled ? "🔊" : "🔇");
   }
 
   private void updateOutlineLabel() {
