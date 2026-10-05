@@ -21,7 +21,7 @@ actions:
     verified_allowed: false
     patterns_allowed:
       - Vivswan/github-settings-as-code@*
-      - gradle/actions@*
+      - gradle/actions/wrapper-validation@*
       - Kira-NT/mc-publish@*
   default_workflow_permissions: read
   can_approve_pull_request_reviews: false
