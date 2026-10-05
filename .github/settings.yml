@@ -41,6 +41,7 @@ rulesets:
         include:
           - ~DEFAULT_BRANCH
           - lts-mc*
+          - archive-mc*
         exclude: []
     rules:
       - type: deletion
