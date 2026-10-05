@@ -60,7 +60,7 @@ public final class ZoneOutlines {
       return;
     }
     String dimension = context.level().dimension().identifier().toString();
-    zones = settings.zones.stream().filter(zone -> zone.enabled() && zone.dimension().equals(dimension))
+    zones = settings.zones.stream().filter(zone -> zone.dimension().equals(dimension))
         .sorted(java.util.Comparator.comparing(zone -> zone.id().toString()))
         .map(zone -> new Bounds(zone.minX(), zone.minY(), zone.minZ(), zone.maxX() + 1, zone.maxY() + 1, zone.maxZ() + 1, zone.color())).toList();
   }
