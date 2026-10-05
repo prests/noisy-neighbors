@@ -13,7 +13,7 @@ Noisy Neighbors is a client-side Minecraft mod for players who want a peaceful b
 Give each catalogued vanilla mob its own **Volume** and **Chattiness** setting, then create coloured 3D sound zones for places such as animal farms, trading halls, mob grinders, and stables. It works in single-player and on multiplayer servers with no server installation.
 
 <p align="center">
-  <img src="docs/images/multi-zone-example.jpg" alt="Three differently coloured sound zones around Minecraft animal pens" width="900">
+  <img src="docs/images/multi-zone-example.jpg" alt="Three differently coloured sound zones around Minecraft animal pens">
 </p>
 
 ## What you can do
@@ -55,7 +55,7 @@ Use **⚙ Advanced Volume Controls** beside a mob when one particular sound need
 Global settings are your default everywhere. Zone settings apply on top when a sound originates inside that zone, so a cow farm can be quiet while cows outside remain normal. If zones overlap, their settings combine.
 
 <p align="center">
-  <img src="docs/images/zone-sound-controls.jpg" alt="Zone Sound Controls showing per-mob volume and chattiness sliders" width="900">
+  <img src="docs/images/zone-sound-controls.jpg" alt="Zone Sound Controls showing per-mob volume and chattiness sliders">
 </p>
 
 ## Create a sound zone
@@ -70,7 +70,7 @@ Use a sound zone whenever you only want a location to be calmer—an animal farm
 Press your configured **Create Zone** key again while selecting corners to cancel.
 
 <p align="center">
-  <img src="docs/images/single-zone-example.jpg" alt="A coloured sound-zone outline enclosing a Minecraft animal pen" width="900">
+  <img src="docs/images/single-zone-example.jpg" alt="A coloured sound-zone outline enclosing a Minecraft animal pen">
 </p>
 
 ## Manage zones quickly
@@ -84,7 +84,7 @@ Open Minecraft's **Controls** menu and look under **Noisy Neighbors** to configu
 From a zone's screen, you can rename it, change its outline colour, edit its bounds, or delete it.
 
 <p align="center">
-  <img src="docs/images/zone-selection-menu.jpg" alt="World Zones menu listing named sound zones and outline controls" width="900">
+  <img src="docs/images/zone-selection-menu.jpg" alt="World Zones menu listing named sound zones and outline controls">
 </p>
 
 ## What Noisy Neighbors changes
