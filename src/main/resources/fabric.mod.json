@@ -11,6 +11,7 @@
 		"sources": "https://github.com/prests/noisy-neighbors"
 	},
 	"license": "MIT",
+	"icon": "assets/noisy-neighbors/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [
@@ -22,9 +23,9 @@
 	},
 	"mixins": ["noisy-neighbors.client.mixins.json"],
 	"depends": {
-		"fabricloader": ">=0.19.3",
+		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.3",
 		"java": ">=25",
-		"fabric-api": ">=0.160.6"
+		"fabric-api": ">=0.161.0+26.3"
 	}
 }
