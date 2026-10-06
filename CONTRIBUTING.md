@@ -24,9 +24,21 @@ Install JDK 25 and import this directory as a Gradle project. [IntelliJ IDEA](ht
 
 `runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
 
-## Version policy
+## Support and end-of-life policy
 
-`main` supports the newest Minecraft release. When a new release becomes the target, an older version gets a maintenance branch (for example, `lts-mc26.3`) only when it needs further fixes. The previous major Minecraft release is supported until a new major version is released. In which case the oldest `lts` version becomes `archived`.
+`main` supports the newest Minecraft release and the newest mod major version. Releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3-fabric` is mod version `2.1.0` for Minecraft `26.3`.
+
+A long-term-support branch is created only when a supported combination has moved off `main`. Its name is `lts/v<mod-major>.x-mc<minecraft-version>`; for example, `lts/v1.x-mc26.3`. Do not create a branch for the combination currently on `main`.
+
+LTS branches receive compatible bug and security fixes only. New features, new mod majors, and Minecraft ports stay on `main`. Fixes should land on `main` first, then be cherry-picked to each supported lts branch. A branch is not supported until its CI and release workflow can build and publish that branch.
+
+A lts branch becomes archived when either its Minecraft release is no longer in the supported window (essentially as soon as a newer version of Minecraft is released). When archiving a branch the process should be:
+- Mark the branch `archived`.
+- stop publishing fixes for that branch.
+- update the final supported mod/Minecraft release in the relevant release notes across Github, Modrinth, and CurseForge.
+  - The note should be: "THIS IS THE FINAL UPDATE FOR THIS MINECRAFT VERSION. PLEASE UPDATE TO THE LATEST MINECRAFT VERSION FOR FUTURE FEATURES AND BUG FIXES."
+
+Tags and published JARs remain available; users should upgrade to the supported line.
 
 ## Contributing a change
 
