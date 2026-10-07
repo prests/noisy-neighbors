@@ -102,7 +102,7 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 
 ## Contributing
 
-Looking to contribute? See [CONTRIBUTING](CONTRIBUTING.md).
+Looking to contribute to the Noisy Neighbors mod? See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## License
 
