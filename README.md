@@ -100,6 +100,14 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 - Fabric API 0.161.0+26.3
 - Java 25 or newer
 
+## Contributing
+
+Looking to contribute to the Noisy Neighbors mod? See [CONTRIBUTING](CONTRIBUTING.md).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Credits
+
+- [Simplexity-Development/Entity-Icons](https://github.com/Simplexity-Development/Entity-Icons) - For some of the mob sprites provided! (Released under CC0-1.0 license)
