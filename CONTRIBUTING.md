@@ -1,6 +1,6 @@
 # Contributing to Noisy Neighbors
 
-Thanks for helping improve Noisy Neighbors.
+Thanks for helping improve Noisy Neighbors! We appreciate you wanting to get involved.
 
 ## Compatibility
 

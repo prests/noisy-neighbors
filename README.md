@@ -100,6 +100,10 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 - Fabric API 0.161.0+26.3
 - Java 25 or newer
 
+## Contributing
+
+Looking to contribute? See [CONTRIBUTING](CONTRIBUTING.md).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
