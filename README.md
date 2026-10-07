@@ -107,3 +107,7 @@ Looking to contribute to the Noisy Neighbors mod? See [CONTRIBUTING](CONTRIBUTIN
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Credits
+
+- [Simplexity-Development/Entity-Icons](https://github.com/Simplexity-Development/Entity-Icons) - For some of the mob sprites provided! (Released under CC0-1.0 license)

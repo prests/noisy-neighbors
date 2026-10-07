@@ -24,6 +24,8 @@ Install JDK 25 and import this directory as a Gradle project. [IntelliJ IDEA](ht
 
 `runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
 
+**Note:** See [Our Testing Doc](TESTING.md) for more information and best practices to ensure proper test coverage.
+
 ## Support and end-of-life policy
 
 `main` supports the newest Minecraft release and the newest mod major version. Releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3-fabric` is mod version `2.1.0` for Minecraft `26.3`.
@@ -44,7 +46,7 @@ Tags and published JARs remain available; users should upgrade to the supported 
 
 1. Fork the repository on GitHub, clone your fork, and create a branch from `main` or an `lts` branch if fixing a bug in an older version.
 2. Make the change and run the relevant Gradle commands from [Development](#development) to ensure there are no regressions before creating your pull request.
-3. Push the branch to your fork and open a pull request against `prests/noisy-neighbors:main` or `prests/noisy-neighbors:lts-mc<insert-version>` (if targetting an older version of Minecraft).
+3. Push the branch to your fork and open a pull request against `prests/noisy-neighbors:main` or `prests/noisy-neighbors:lts-mc<insert-version>` (if targeting an older version of Minecraft).
 4. The fork pull request runs the `build` check with a read-only token and no repository or environment secrets. Address review feedback and keep the branch current if GitHub requests it.
 5. A project contributor approves the pull request and merges it once the required `build` check passes. Changes under `.github/` also need `@prests` approval.
 6. After the merge, wait for a contributor to manually dispatch the release workflow.
