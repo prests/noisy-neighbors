@@ -49,6 +49,7 @@ class EntityOptionsList extends ContainerObjectSelectionList<EntityOptionsList.R
         Row row = getEntry(index);
         if (row.mouseClicked(mouseX, mouseY, button)) {
           setFocused(row);
+          setDragging(true);
           return true;
         }
       }
