@@ -25,20 +25,11 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v6
 
-      - name: Read JDK version from build configuration
-        id: java
-        shell: bash
-        run: |
-          set -euo pipefail
-          java_version="$(sed -nE 's/^[[:space:]]*sourceCompatibility[[:space:]]*=[[:space:]]*JavaVersion\.VERSION_([0-9]+).*/\1/p' build.gradle)"
-          test -n "$java_version"
-          echo "version=$java_version" >> "$GITHUB_OUTPUT"
-
-      - name: Set up JDK for selected branch
+      - name: Set up JDK 25 (required by Loom)
         uses: actions/setup-java@v6
         with:
           distribution: microsoft
-          java-version: ${{ steps.java.outputs.version }}
+          java-version: '25'
 
       - name: Read release metadata
         id: release
