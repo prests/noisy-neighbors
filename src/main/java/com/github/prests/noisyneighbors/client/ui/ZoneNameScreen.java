@@ -38,13 +38,13 @@ public final class ZoneNameScreen extends Screen {
   }
 
   @Override public void onClose() {
-    minecraft.gui.setScreen(parent);
+    minecraft.setScreen(parent);
   }
 
   private void save() {
     SettingsStore.updateZone(worldKey, zoneId, zone -> renamed(zone, name.getValue()));
     SettingsStore.save();
-    minecraft.gui.setScreen(parent.refreshed());
+    minecraft.setScreen(parent.refreshed());
   }
 
   private static Zone renamed(Zone zone, String name) {

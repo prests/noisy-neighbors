@@ -72,7 +72,7 @@ public final class ZoneSelection {
   }
 
   private static void overlay(Component message) {
-    if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.sendOverlayMessage(message);
+    if (Minecraft.getInstance().player != null) Minecraft.getInstance().gui.setOverlayMessage(message, false);
   }
 
   private static void saveZone(Level level, BlockPos first, BlockPos second) {
@@ -81,12 +81,12 @@ public final class ZoneSelection {
     if (editingZoneId != null) {
       if (!identity.key().equals(editingWorldKey)) return;
       SettingsStore.updateZone(editingWorldKey, editingZoneId, zone -> new Zone(zone.id(), zone.name(), zone.enabled(), zone.color(),
-          level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(), second.getX(), second.getY(), second.getZ(),
+          level.dimension().location().toString(), first.getX(), first.getY(), first.getZ(), second.getX(), second.getY(), second.getZ(),
           zone.volumes(), zone.events(), zone.chattiness()));
     } else {
       int number = SettingsStore.data().worlds.getOrDefault(identity.key(), new SettingsStore.World()).zones.size() + 1;
       SettingsStore.addZone(identity, new Zone(UUID.randomUUID(), "Zone " + number, true,
-          level.dimension().identifier().toString(), first.getX(), first.getY(), first.getZ(),
+          level.dimension().location().toString(), first.getX(), first.getY(), first.getZ(),
           second.getX(), second.getY(), second.getZ(), Map.of()));
     }
     SettingsStore.save();

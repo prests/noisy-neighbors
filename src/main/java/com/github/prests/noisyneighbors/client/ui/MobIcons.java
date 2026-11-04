@@ -3,13 +3,12 @@ package com.github.prests.noisyneighbors.client.ui;
 import com.github.prests.noisyneighbors.client.sound.MobSoundCatalog;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 /** Pixel-art mob portraits, including both mobs when a volume control is shared. */
 final class MobIcons {
-  private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("noisy-neighbors", "textures/gui/mob_icons.png");
+  private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("noisy-neighbors", "textures/gui/mob_icons.png");
   private static final int SPRITE_SIZE = 8;
   private static final int ICON_SIZE = 20;
   static final int WIDTH = ICON_SIZE + 2;
@@ -108,7 +107,7 @@ final class MobIcons {
 
   private MobIcons() {}
 
-  static void draw(GuiGraphicsExtractor graphics, String mob, int x, int y) {
+  static void draw(GuiGraphics graphics, String mob, int x, int y) {
     List<String> variants = MobSoundCatalog.variantsFor(mob);
     if (variants.size() == 1) {
       draw(graphics, variants.getFirst(), x, y, ICON_SIZE);
@@ -118,19 +117,19 @@ final class MobIcons {
     drawHalf(graphics, variants.get(1), x + ICON_SIZE / 2, y, true);
   }
 
-  private static void draw(GuiGraphicsExtractor graphics, String mob, int x, int y, int height) {
+  private static void draw(GuiGraphics graphics, String mob, int x, int y, int height) {
     Sprite sprite = icon(mob);
     if (sprite == null) return;
-    graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, sprite.x * SPRITE_SIZE, sprite.y * SPRITE_SIZE,
-        ICON_SIZE, height, SPRITE_SIZE, SPRITE_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
+    graphics.blit(TEXTURE, x, y, ICON_SIZE, height, sprite.x * SPRITE_SIZE, sprite.y * SPRITE_SIZE,
+        SPRITE_SIZE, SPRITE_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
   }
 
-  private static void drawHalf(GuiGraphicsExtractor graphics, String mob, int x, int y, boolean right) {
+  private static void drawHalf(GuiGraphics graphics, String mob, int x, int y, boolean right) {
     Sprite sprite = icon(mob);
     if (sprite == null) return;
     int half = SPRITE_SIZE / 2;
-    graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, sprite.x * SPRITE_SIZE + (right ? half : 0), sprite.y * SPRITE_SIZE,
-        ICON_SIZE / 2, ICON_SIZE, half, SPRITE_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
+    graphics.blit(TEXTURE, x, y, ICON_SIZE / 2, ICON_SIZE, sprite.x * SPRITE_SIZE + (right ? half : 0), sprite.y * SPRITE_SIZE,
+        half, SPRITE_SIZE, SHEET_WIDTH, SHEET_HEIGHT);
   }
 
   private static Sprite icon(String mob) { return ICONS.get(mob.replace("minecraft:", "")); }

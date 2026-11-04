@@ -4,67 +4,53 @@ import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.config.WorldIdentity;
 import com.github.prests.noisyneighbors.client.zone.Zone;
 import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 
 /** Lists the saved zones for the currently connected world. */
-public final class WorldZonesScreen extends OptionsSubScreen {
+public final class WorldZonesScreen extends Screen {
+  private static final int CONTENT_WIDTH = 310;
+  private final Screen parent;
   private final WorldIdentity world;
   private Button outlines;
 
   public WorldZonesScreen(Screen parent, WorldIdentity world) {
-    super(parent, Minecraft.getInstance().options, Component.translatable("noisy-neighbors.zones.title", world.displayName()));
+    super(Component.translatable("noisy-neighbors.zones.title", world.displayName()));
+    this.parent = parent;
     this.world = world;
   }
 
-  @Override protected void addTitle() {
-    layout.setHeaderHeight(58);
-    outlines = Button.builder(Component.empty(), button -> {
+  @Override protected void init() {
+    int left = width / 2 - CONTENT_WIDTH / 2;
+    outlines = addRenderableWidget(Button.builder(Component.empty(), button -> {
       SettingsStore.data().showZoneOutlines = !SettingsStore.data().showZoneOutlines;
       updateOutlineLabel();
-    }).width(150).build();
+    }).bounds(left, 30, 150, 20).build());
     updateOutlineLabel();
-    Button create = Button.builder(Component.translatable("noisy-neighbors.create-zone"), button -> {
+    addRenderableWidget(Button.builder(Component.translatable("noisy-neighbors.create-zone"), button -> {
       ZoneSelection.begin();
-      Minecraft.getInstance().gui.setScreen(null);
-    }).width(150).build();
-    LinearLayout row = LinearLayout.horizontal().spacing(10);
-    row.addChild(outlines);
-    row.addChild(create);
-    LinearLayout header = LinearLayout.vertical().spacing(4);
-    header.addChild(new StringWidget(title, font), settings -> settings.alignHorizontallyCenter());
-    header.addChild(row);
-    layout.addToHeader(header);
-  }
+      minecraft.setScreen(null);
+    }).bounds(left + 160, 30, 150, 20).build());
 
-  @Override protected void addContents() {
-    list = (ZoneOptionsList) layout.addToContents(new ZoneOptionsList(Minecraft.getInstance(), width, this));
-    addOptions();
-  }
-
-  @Override protected void addOptions() {
+    ZoneOptionsList zones = addRenderableWidget(new ZoneOptionsList(minecraft, width, height, 70, height - 40));
     SettingsStore.World settings = SettingsStore.data().worlds.get(world.key());
     if (settings == null || settings.zones.isEmpty()) {
-      Button empty = Button.builder(Component.translatable("noisy-neighbors.zones.empty"), button -> {}).width(310).build();
+      Button empty = Button.builder(Component.translatable("noisy-neighbors.zones.empty"), button -> {}).width(CONTENT_WIDTH).build();
       empty.active = false;
-      list.addBig(empty);
-      return;
+      zones.addWidget(empty);
+    } else {
+      for (Zone zone : settings.zones) zones.addZone(createZoneSelector(zone), createZoneToggle(zone));
     }
-
-    ZoneOptionsList zones = (ZoneOptionsList) list;
-    for (Zone zone : settings.zones) zones.addZone(createZoneSelector(zone), createZoneToggle(zone));
+    addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
+        .bounds(width / 2 - 100, height - 28, 200, 20).build());
   }
 
   private Button createZoneSelector(Zone zone) {
     return Button.builder(Component.literal(zone.name() + " — " + zone.dimension().replace("minecraft:", "")),
-        button -> Minecraft.getInstance().gui.setScreen(new ZoneSoundScreen(new WorldZonesScreen(lastScreen, world), world.key(), zone.id())))
-        .build();
+        button -> minecraft.setScreen(new ZoneSoundScreen(new WorldZonesScreen(parent, world), world.key(), zone.id()))).build();
   }
 
   private Button createZoneToggle(Zone zone) {
@@ -99,8 +85,14 @@ public final class WorldZonesScreen extends OptionsSubScreen {
         ? "noisy-neighbors.zones.outlines.on" : "noisy-neighbors.zones.outlines.off"));
   }
 
+  @Override public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    renderBackground(graphics, mouseX, mouseY, delta);
+    super.render(graphics, mouseX, mouseY, delta);
+    graphics.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
+  }
+
   @Override public void onClose() {
     SettingsStore.save();
-    super.onClose();
+    minecraft.setScreen(parent);
   }
 }

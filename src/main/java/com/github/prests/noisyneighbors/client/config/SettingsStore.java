@@ -153,11 +153,11 @@ public final class SettingsStore {
   }
 
   private static void normalizeEvents(Map<String, Map<String, Integer>> events) {
-    events.entrySet().removeIf(entry -> entry.getKey() == null || !MobSoundCatalog.mobs().contains(entry.getKey())
-        || entry.getValue() == null);
+    events.entrySet().removeIf(entry -> entry.getKey() == null || entry.getKey().isBlank() || entry.getValue() == null);
     events.replaceAll((mob, values) -> new HashMap<>(values));
-    events.forEach((mob, values) -> values.entrySet().removeIf(entry -> !valid(entry.getKey(), entry.getValue())
-        || !MobSoundCatalog.controllableEventsFor(mob).contains(entry.getKey()) || entry.getValue() == 100));
+    events.forEach((mob, values) -> values.entrySet().removeIf(entry -> !valid(entry.getKey(), entry.getValue()) || entry.getValue() == 100
+        || (MobSoundCatalog.mobs().contains(mob) && MobSoundCatalog.isKnown(entry.getKey())
+            && !MobSoundCatalog.controllableEventsFor(mob).contains(entry.getKey()))));
     events.entrySet().removeIf(entry -> entry.getValue().isEmpty());
   }
 

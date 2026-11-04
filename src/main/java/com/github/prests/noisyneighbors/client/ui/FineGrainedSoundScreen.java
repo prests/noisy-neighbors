@@ -33,7 +33,7 @@ public final class FineGrainedSoundScreen extends OptionsSubScreen {
   }
 
   @Override protected void addOptions() {
-    MobSoundCatalog.controllableEventsFor(mob).forEach(event -> list.addBig(new EventSlider(event)));
+    MobSoundCatalog.controllableEventsFor(mob).forEach(event -> list.addSmall(java.util.List.of(new EventSlider(event))));
   }
 
   @Override public void onClose() {

@@ -22,7 +22,7 @@ public final class VolumePolicy {
     if (source != null && sourceMob == null) return new Evaluation(1, 1F);
     WorldIdentity world = WorldIdentity.current(client);
     if (world == null) return new Evaluation(1, 1F);
-    return evaluate(SettingsStore.data(), eventId, sourceMob, world.key(), client.level.dimension().identifier().toString(), x, y, z);
+    return evaluate(SettingsStore.data(), eventId, sourceMob, world.key(), client.level.dimension().location().toString(), x, y, z);
   }
 
   public static Evaluation evaluate(SettingsStore.Data data, String eventId, String sourceMobId, String world, String dimension,

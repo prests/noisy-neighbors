@@ -16,21 +16,29 @@ jobs:
       type: ${{ steps.release.outputs.type }}
       prerelease: ${{ steps.release.outputs.prerelease }}
     steps:
-      - name: Check out main
+      - name: Check out selected branch
         uses: actions/checkout@v7
         with:
-          ref: main
           fetch-depth: 0
           persist-credentials: false
 
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v6
 
-      - name: Set up JDK 25
+      - name: Read JDK version from build configuration
+        id: java
+        shell: bash
+        run: |
+          set -euo pipefail
+          java_version="$(sed -nE 's/^[[:space:]]*sourceCompatibility[[:space:]]*=[[:space:]]*JavaVersion\.VERSION_([0-9]+).*/\1/p' build.gradle)"
+          test -n "$java_version"
+          echo "version=$java_version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK for selected branch
         uses: actions/setup-java@v6
         with:
           distribution: microsoft
-          java-version: '25'
+          java-version: ${{ steps.java.outputs.version }}
 
       - name: Read release metadata
         id: release
@@ -74,16 +82,6 @@ jobs:
 
       - name: Build and run JVM/server tests
         run: ./gradlew build
-
-      - name: Install headless OpenGL dependencies
-        run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
-
-      - name: Run production client GameTest
-        env:
-          ALSOFT_DRIVERS: "null"
-          LIBGL_ALWAYS_SOFTWARE: "1"
-          MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
-        run: ./gradlew runProductionClientGameTest
 
       - name: Create SHA-256 checksum
         shell: bash

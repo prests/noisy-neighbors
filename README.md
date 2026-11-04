@@ -28,7 +28,7 @@ Give each catalogued vanilla mob its own **Volume** and **Chattiness** setting, 
 
 ## Quick start
 
-1. Install Noisy Neighbors, [Fabric Loader](https://fabricmc.net/), and Fabric API for Minecraft 26.3.
+1. Install Noisy Neighbors, [Fabric Loader](https://fabricmc.net/), and Fabric API for Minecraft 1.21.1.
 2. In Minecraft, open **Options → Music & Sound → Advanced Sound Controls**.
 3. Search for a mob, then set its **Volume** and **Chattiness** sliders.
 4. To quiet only part of a world, choose **Edit World Zones** and create a zone.
@@ -95,10 +95,10 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 
 ## Requirements
 
-- Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5
-- Fabric API 0.161.0+26.3
-- Java 25 or newer
+- Minecraft Java Edition 1.21.1
+- Fabric Loader 0.15.11 or newer
+- Fabric API 0.116.17+1.21.1 or newer
+- Java 21 or newer
 
 ## Contributing
 

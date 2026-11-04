@@ -3,7 +3,7 @@ package com.github.prests.noisyneighbors.client.ui;
 import com.github.prests.noisyneighbors.client.config.SettingsStore;
 import com.github.prests.noisyneighbors.client.zone.Zone;
 import java.util.UUID;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -48,7 +48,7 @@ public final class ZoneColorScreen extends Screen {
   }
 
   @Override public void onClose() {
-    minecraft.gui.setScreen(parent);
+    minecraft.setScreen(parent);
   }
 
   private void updatePreview() {
@@ -73,7 +73,7 @@ public final class ZoneColorScreen extends Screen {
   private void save() {
     SettingsStore.updateZone(worldKey, zoneId, zone -> recolored(zone, color));
     SettingsStore.save();
-    minecraft.gui.setScreen(parent.refreshed());
+    minecraft.setScreen(parent.refreshed());
   }
 
   private static Zone recolored(Zone zone, int color) {
@@ -118,7 +118,7 @@ public final class ZoneColorScreen extends Screen {
       this.color = color;
     }
 
-    @Override protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    @Override protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
       graphics.fill(getX(), getY(), getX() + width, getY() + height, 0xFFFFFFFF);
       graphics.fill(getX() + 2, getY() + 2, getX() + width - 2, getY() + height - 2, 0xFF000000 | color);
     }

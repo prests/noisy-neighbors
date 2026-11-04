@@ -6,102 +6,105 @@ import com.github.prests.noisyneighbors.client.zone.Zone;
 import com.github.prests.noisyneighbors.client.zone.ZoneSelection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
-import net.minecraft.client.Minecraft;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 
 /** Per-mob volume limits for one saved zone. */
-public final class ZoneSoundScreen extends OptionsSubScreen {
+public final class ZoneSoundScreen extends Screen {
+  private static final int CONTENT_WIDTH = 310;
+  private final Screen parent;
   private final String worldKey;
   private final UUID zoneId;
-  private FilteredOptionsList filteredList;
   private EditBox search;
+  private EntityOptionsList entityList;
+  private Button details;
+  private Button rename;
+  private Button delete;
+  private Button color;
+  private Button editBounds;
 
   public ZoneSoundScreen(Screen parent, String worldKey, UUID zoneId) {
-    super(parent, Minecraft.getInstance().options, Component.translatable("noisy-neighbors.zone.title"));
+    super(Component.translatable("noisy-neighbors.zone.title"));
+    this.parent = parent;
     this.worldKey = worldKey;
     this.zoneId = zoneId;
   }
 
-  @Override protected void addContents() {
-    filteredList = (FilteredOptionsList) layout.addToContents(new FilteredOptionsList(Minecraft.getInstance(), width, this));
-    list = filteredList;
-    addOptions();
-  }
-
-  @Override protected void addOptions() {
+  @Override protected void init() {
     Zone zone = zone();
-    if (zone == null) return;
-    Button details = Button.builder(Component.literal(zone.name() + " — " + bounds(zone)), button -> {}).width(310).build();
+    if (zone == null) {
+      onClose();
+      return;
+    }
+    details = Button.builder(Component.literal(zone.name() + " — " + bounds(zone)), button -> {}).width(CONTENT_WIDTH).build();
     details.active = false;
-    list.addBig(details);
-    Button rename = Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
-        button -> Minecraft.getInstance().gui.setScreen(new ZoneNameScreen(this, worldKey, zoneId, zone.name())))
-        .width(150).build();
-    Button delete = Button.builder(Component.translatable("noisy-neighbors.zone.delete"),
-        button -> confirmDelete(zone)).width(150).build();
-    list.addSmall(rename, delete);
-    Button color = Button.builder(Component.translatable("noisy-neighbors.zone.color"),
-        button -> Minecraft.getInstance().gui.setScreen(new ZoneColorScreen(this, worldKey, zoneId, zone.color())))
-        .width(150).build();
-    Button editBounds = Button.builder(Component.translatable("noisy-neighbors.zone.edit-bounds"), button -> {
+    rename = Button.builder(Component.translatable("noisy-neighbors.zone.rename"),
+        button -> minecraft.setScreen(new ZoneNameScreen(this, worldKey, zoneId, zone.name()))).width(150).build();
+    delete = Button.builder(Component.translatable("noisy-neighbors.zone.delete"), button -> confirmDelete(zone)).width(150).build();
+    color = Button.builder(Component.translatable("noisy-neighbors.zone.color"),
+        button -> minecraft.setScreen(new ZoneColorScreen(this, worldKey, zoneId, zone.color()))).width(150).build();
+    editBounds = Button.builder(Component.translatable("noisy-neighbors.zone.edit-bounds"), button -> {
       ZoneSelection.beginEdit(worldKey, zoneId);
-      Minecraft.getInstance().gui.setScreen(null);
+      minecraft.setScreen(null);
     }).width(150).build();
-    editBounds.active = Minecraft.getInstance().level != null
-        && zone.dimension().equals(Minecraft.getInstance().level.dimension().identifier().toString());
-    list.addSmall(color, editBounds);
-    search = new EditBox(font, 0, 0, 310, 20, Component.translatable("noisy-neighbors.search.entities"));
-    search.setHint(Component.translatable("noisy-neighbors.search.entities").withStyle(EditBox.SEARCH_HINT_STYLE));
+    editBounds.active = minecraft.level != null && zone.dimension().equals(minecraft.level.dimension().location().toString());
+    search = new EditBox(font, 0, 0, CONTENT_WIDTH, 20, Component.translatable("noisy-neighbors.search.entities"));
+    search.setHint(Component.translatable("noisy-neighbors.search.entities").withStyle(ChatFormatting.DARK_GRAY));
+    entityList = addRenderableWidget(new EntityOptionsList(minecraft, width, height, 40, height - 40));
     search.setResponder(query -> refreshOptions());
-    list.addBig(search);
-    filteredList.rememberEntries();
     refreshOptions();
+    addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
+        .bounds(width / 2 - 100, height - 28, 200, 20).build());
   }
 
   private void refreshOptions() {
-    filteredList.showFixedEntries();
+    entityList.clear();
     Zone zone = zone();
-    List<String> mobs = zone == null ? List.of() : MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
-        .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue())).toList();
-    mobs.forEach(mob -> {
-      Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL, button -> Minecraft.getInstance().gui.setScreen(
-          new FineGrainedSoundScreen(this, worldKey, zoneId, mob))).width(20).build();
-      advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
-      filteredList.addEntity(mob, Component.literal(MobSoundCatalog.displayName(mob)),
-          new MobSlider(mob, zone.volumes().getOrDefault(mob, 100), false),
-          new MobSlider(mob, zone.chattiness().getOrDefault(mob, 100), true), advanced);
-    });
-    if (mobs.isEmpty()) {
-      Button empty = Button.builder(Component.translatable("noisy-neighbors.search.empty"), button -> {}).width(310).build();
-      empty.active = false;
-      list.addBig(empty);
-    }
-    list.setScrollAmount(0);
+    if (zone == null) return;
+    entityList.addFullWidthWidget(details);
+    entityList.addWidgetPair(rename, delete);
+    entityList.addWidgetPair(color, editBounds);
+    entityList.addFullWidthWidget(search);
+    MobSoundCatalog.mobs().stream().sorted(Comparator.naturalOrder())
+        .filter(mob -> MobSoundCatalog.matchesSearch(mob, search.getValue()))
+        .forEach(mob -> {
+          Button advanced = Button.builder(EntityOptionsList.ADVANCED_LABEL,
+              button -> minecraft.setScreen(new FineGrainedSoundScreen(this, worldKey, zoneId, mob))).width(20).build();
+          advanced.setTooltip(Tooltip.create(Component.translatable("noisy-neighbors.advanced-controls")));
+          entityList.addEntity(mob, Component.literal(MobSoundCatalog.displayName(mob)),
+              new MobSlider(mob, zone.volumes().getOrDefault(mob, 100), false),
+              new MobSlider(mob, zone.chattiness().getOrDefault(mob, 100), true), advanced);
+        });
+    entityList.setScrollAmount(0);
+  }
+
+  @Override public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    renderBackground(graphics, mouseX, mouseY, delta);
+    super.render(graphics, mouseX, mouseY, delta);
+    graphics.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
   }
 
   @Override public void onClose() {
     SettingsStore.save();
-    super.onClose();
+    minecraft.setScreen(parent);
   }
 
   private void confirmDelete(Zone zone) {
-    Minecraft.getInstance().gui.setScreen(new ConfirmScreen(confirmed -> {
+    minecraft.setScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
         SettingsStore.removeZone(worldKey, zoneId);
         SettingsStore.save();
-        Minecraft.getInstance().gui.setScreen(lastScreen);
+        minecraft.setScreen(parent);
       } else {
-        Minecraft.getInstance().gui.setScreen(this);
+        minecraft.setScreen(this);
       }
     }, Component.translatable("noisy-neighbors.zone.delete.title", zone.name()),
         Component.translatable("noisy-neighbors.zone.delete.warning"),
@@ -109,7 +112,7 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
   }
 
   ZoneSoundScreen refreshed() {
-    return new ZoneSoundScreen(lastScreen, worldKey, zoneId);
+    return new ZoneSoundScreen(parent, worldKey, zoneId);
   }
 
   private Zone zone() {
@@ -123,28 +126,12 @@ public final class ZoneSoundScreen extends OptionsSubScreen {
         + zone.maxX() + "," + zone.maxY() + "," + zone.maxZ();
   }
 
-  private static final class FilteredOptionsList extends EntityOptionsList {
-    private List<AbstractEntry> fixedEntries = List.of();
-
-    FilteredOptionsList(Minecraft minecraft, int width, OptionsSubScreen screen) {
-      super(minecraft, width, screen);
-    }
-
-    void rememberEntries() {
-      fixedEntries = List.copyOf(children());
-    }
-
-    void showFixedEntries() {
-      replaceEntries(fixedEntries);
-    }
-  }
-
   private final class MobSlider extends AbstractSliderButton {
     private final String mob;
     private final boolean chattiness;
 
     MobSlider(String mob, int percentage, boolean chattiness) {
-      super(0, 0, 310, 20, Component.empty(), percentage / 100D);
+      super(0, 0, 0, 20, Component.empty(), percentage / 100D);
       this.mob = mob;
       this.chattiness = chattiness;
       updateMessage();

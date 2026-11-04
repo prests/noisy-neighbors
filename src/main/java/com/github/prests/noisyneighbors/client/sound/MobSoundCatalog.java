@@ -23,12 +23,14 @@ public final class MobSoundCatalog {
   private static Map<String, List<String>> mobVariants = Map.of();
   private static Set<String> sharedEvents = Set.of();
   private static Map<String, List<String>> controllableEvents = Map.of();
+  private static int eventCount;
 
   private MobSoundCatalog() {}
   public static void load() {
     try (var stream = MobSoundCatalog.class.getResourceAsStream("/assets/noisy-neighbors/mob_sounds.json")) {
       if (stream == null) throw new IllegalStateException("Missing mob sound catalog");
       Catalog catalog = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), Catalog.class);
+      eventCount = catalog.mobs.values().stream().mapToInt(List::size).sum();
       Map<String, Set<String>> reverse = new HashMap<>();
       for (Map.Entry<String, List<String>> entry : catalog.mobs.entrySet()) for (String event : entry.getValue()) {
         reverse.computeIfAbsent(event, ignored -> new LinkedHashSet<>()).add(entry.getKey());
@@ -54,7 +56,7 @@ public final class MobSoundCatalog {
       controllableEvents = Map.copyOf(controls);
     } catch (Exception exception) {
       NoisyNeighbors.LOGGER.error("Noisy Neighbors sound catalog is invalid; controls are disabled", exception);
-      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); mobVariants = Map.of(); sharedEvents = Set.of(); controllableEvents = Map.of();
+      eventToMobs = Map.of(); sourceAliases = Map.of(); mobIds = Set.of(); mobVariants = Map.of(); sharedEvents = Set.of(); controllableEvents = Map.of(); eventCount = 0;
     }
   }
   public static String mobFor(String eventId, String sourceMobId) {
@@ -71,6 +73,7 @@ public final class MobSoundCatalog {
   }
   public static boolean isKnown(String eventId) { return eventToMobs.containsKey(eventId) || sharedEvents.contains(eventId); }
   public static Set<String> mobs() { return mobIds; }
+  public static int eventCount() { return eventCount; }
   public static List<String> variantsFor(String mob) { return mobVariants.getOrDefault(mob, List.of(mob)); }
   /** Events that can identify this canonical group without source-entity metadata. */
   public static List<String> controllableEventsFor(String mob) { return controllableEvents.getOrDefault(mob, List.of()); }

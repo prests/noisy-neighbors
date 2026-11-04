@@ -121,6 +121,22 @@ class SettingsStoreIntegrationTest {
     assertEquals(50, reloaded.data().worlds.get(world.key()).zones.getFirst().chattiness().get("minecraft:cow"));
   }
 
+  @Test void preservesUnknownNewerCatalogEntriesWithoutApplyingThem() throws Exception {
+    Path file = tempDir.resolve("settings.json");
+    Files.writeString(file, "{\"version\":1,\"events\":{\"minecraft:happy_ghast\":{\"minecraft:entity.happy_ghast.ambient\":25},"
+        + "\"minecraft:cow\":{\"minecraft:entity.cow.newer_sound\":50,\"minecraft:entity.pig.ambient\":30}},\"worlds\":{}}");
+    SettingsStore.Store store = SettingsStore.at(file);
+    store.load();
+    store.save();
+
+    SettingsStore.Store reloaded = SettingsStore.at(file);
+    reloaded.load();
+    assertEquals(25, reloaded.data().events.get("minecraft:happy_ghast").get("minecraft:entity.happy_ghast.ambient"));
+    assertEquals(50, reloaded.data().events.get("minecraft:cow").get("minecraft:entity.cow.newer_sound"));
+    assertFalse(reloaded.data().events.get("minecraft:cow").containsKey("minecraft:entity.pig.ambient"));
+    assertEquals(1F, VolumePolicy.multiplier(reloaded.data(), "minecraft:entity.cow.newer_sound", "minecraft:cow", "world", "minecraft:overworld", 0, 0, 0));
+  }
+
   @Test void ignoresMissingCorruptUnsupportedAndInvalidPersistedData() throws Exception {
     Path file = tempDir.resolve("settings.json");
     SettingsStore.Store missing = SettingsStore.at(file);

@@ -4,22 +4,21 @@ Thanks for helping improve Noisy Neighbors! We appreciate you wanting to get inv
 
 ## Compatibility
 
-- Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5
-- Java 25
-- Fabric API 0.161.0+26.3
+- Minecraft Java Edition 1.21.1
+- Fabric Loader 0.15.11 or newer
+- Java 21
+- Fabric API 0.116.17+1.21.1 or newer
 
 Fabric is the only supported loader.
 
 ## Development
 
-Install JDK 25 and import this directory as a Gradle project. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended by Fabric; VS Code is also supported.
+Install JDK 25 for Gradle and import this directory as a Gradle project. The mod itself targets Java 21. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended by Fabric; VS Code is also supported.
 
 ```sh
 ./gradlew runClient
 ./gradlew test
 ./gradlew build
-./gradlew runProductionClientGameTest
 ```
 
 `runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
