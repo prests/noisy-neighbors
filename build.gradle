@@ -1,76 +1,56 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
+  id 'base'
+  id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+  id 'net.neoforged.moddev' version "${moddevgradle_version}" apply false
 }
 
-repositories {
-	// Loom adds the repositories needed for Minecraft and Fabric dependencies.
+allprojects {
+  group = rootProject.group
+  version = rootProject.version
 }
 
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-	productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+subprojects {
+  repositories {
+    maven {
+      name = 'Fabric'
+      url = 'https://maven.fabricmc.net/'
+    }
+    mavenCentral()
+  }
+
+  tasks.withType(JavaCompile).configureEach {
+    options.release = rootProject.java_version as int
+  }
 }
 
-fabricApi {
-	configureTests {
-		createSourceSet = true
-		modId = "noisy-neighbors-test"
-		enableGameTests = true
-		enableClientGameTests = true
-		eula = true
-	}
+tasks.named('clean') {
+  dependsOn(':common:clean', ':fabric:clean', ':neoforge:clean')
 }
 
-// Production runs need the separate test mod on their runtime classpath.
-def gametestJar = tasks.register("gametestJar", Jar) {
-	archiveClassifier = "gametest"
-	from sourceSets.gametest.output
-}
-dependencies.add("productionRuntimeMods", files(gametestJar))
-
-tasks.register("runProductionClientGameTest", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
-	jvmArgs.add("-Dfabric.client.gametest")
-	useXVFB = System.getProperty("os.name").toLowerCase().contains("linux")
+tasks.named('build') {
+  dependsOn(':common:test', ':fabric:build', ':neoforge:build')
 }
 
-processResources {
-	def version = project.version
-	inputs.property "version", version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": version
-	}
+tasks.register('test') {
+  group = 'verification'
+  description = 'Runs the shared JVM test suite.'
+  dependsOn(':common:test')
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+tasks.register('runProductionClientGameTest') {
+  group = 'verification'
+  description = 'Runs the Fabric production client GameTest.'
+  dependsOn(':fabric:runProductionClientGameTest')
 }
 
-tasks.named("test") {
-	useJUnitPlatform()
+tasks.register('runFabricClient') {
+  group = 'application'
+  description = 'Runs the Fabric development client.'
+  dependsOn(':fabric:runClient')
 }
 
-java {
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
-}
-
-jar {
-	def projectName = project.name
-	from("LICENSE") {
-		rename { "${it}_${projectName}" }
-	}
-}
-
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
-	}
+tasks.register('runNeoForgeClient') {
+  group = 'application'
+  description = 'Runs the NeoForge development client.'
+  dependsOn(':neoforge:runClient')
 }

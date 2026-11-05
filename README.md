@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/main/resources/assets/noisy-neighbors/icon.png" alt="Noisy Neighbors logo" height="250" style="border-radius: 16px;"><br>
+  <img src="common/src/main/resources/assets/noisy-neighbors/icon.png" alt="Noisy Neighbors logo" height="250" style="border-radius: 16px;"><br>
   <a href="https://rootapp.gg/ADGsp7WhhQq3rTIL0m_mXg"><img src="branding/root-join-button.svg" alt="Root Community join button" height="112"></a><br>
   <a href="https://modrinth.com/mod/noisy-neighbors"><img alt="Modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a> <a href="https://www.curseforge.com/minecraft/mc-mods/noisy-neighbors"><img alt="CurseForge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg"></a>
 </p>
@@ -28,12 +28,14 @@ Give each catalogued vanilla mob its own **Volume** and **Chattiness** setting, 
 
 ## Quick start
 
-1. Install Noisy Neighbors, [Fabric Loader](https://fabricmc.net/), and Fabric API for Minecraft 26.3.
+1. Install one loader setup for Minecraft 26.3:
+   - **Fabric:** Fabric Loader, Fabric API, and the Noisy Neighbors Fabric JAR.
+   - **NeoForge:** NeoForge and the Noisy Neighbors NeoForge JAR.
 2. In Minecraft, open **Options → Music & Sound → Advanced Sound Controls**.
 3. Search for a mob, then set its **Volume** and **Chattiness** sliders.
 4. To quiet only part of a world, choose **Edit World Zones** and create a zone.
 
-Noisy Neighbors is entirely client-side. Install it once on your own client; it works in single-player, Realms-style multiplayer, and ordinary vanilla or modded servers without requiring anyone else to install it.
+Do not install both loader JARs together. Noisy Neighbors is entirely client-side: it works in single-player, Realms-style multiplayer, and ordinary vanilla or modded servers without requiring server installation or a network handshake.
 
 ## Hotkeys
 
@@ -96,9 +98,12 @@ Settings are stored locally in `config/noisy-neighbors.json`.
 ## Requirements
 
 - Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5
-- Fabric API 0.161.0+26.3
 - Java 25 or newer
+- One of:
+  - Fabric Loader 0.20.1 or newer, Fabric API 0.165.0+26.3 or newer, and the Fabric artifact
+  - NeoForge 26.3.0.101 or newer in the 26.3 series, and the NeoForge artifact
+
+Both artifacts use the same `config/noisy-neighbors.json` format, so settings can be moved between loaders.
 
 ## Contributing
 

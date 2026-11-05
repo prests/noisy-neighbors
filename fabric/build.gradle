@@ -1,0 +1,111 @@
+plugins {
+  id 'net.fabricmc.fabric-loom'
+  id 'maven-publish'
+}
+
+configurations {
+  commonJava {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+  commonResources {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+  clientTestJava {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+}
+
+dependencies {
+  commonJava project(path: ':common', configuration: 'commonJava')
+  commonResources project(path: ':common', configuration: 'commonResources')
+  clientTestJava project(path: ':common', configuration: 'clientTestJava')
+
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+  implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+  testImplementation "net.fabricmc:fabric-loader-junit:${project.fabric_loader_version}"
+  productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+sourceSets.main.java.srcDirs(configurations.commonJava)
+sourceSets.main.resources.srcDirs(configurations.commonResources)
+
+fabricApi {
+  configureTests {
+    createSourceSet = true
+    modId = 'noisy-neighbors-test'
+    enableGameTests = true
+    enableClientGameTests = true
+    eula = true
+  }
+}
+
+sourceSets.gametest.java.srcDirs(configurations.clientTestJava)
+
+def gametestJar = tasks.register('gametestJar', Jar) {
+  archiveClassifier = 'gametest'
+  from sourceSets.gametest.output
+}
+dependencies.add('productionRuntimeMods', files(gametestJar))
+
+loom {
+  runs {
+    client {
+      client()
+      displayName.set('Noisy Neighbors - Fabric Client')
+      generateRunConfig.set(true)
+      runDirectory.set(rootProject.layout.projectDirectory.dir('run/fabric'))
+    }
+  }
+}
+
+tasks.register('runProductionClientGameTest', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+  jvmArgs.add('-Dfabric.client.gametest')
+  useXVFB = System.getProperty('os.name').toLowerCase().contains('linux')
+}
+
+def modVersion = project.version.toString()
+def minecraftVersion = project.minecraft_version.toString()
+def metadata = [
+    version: modVersion,
+    minecraft_version: minecraftVersion,
+    java_version: project.java_version,
+    fabric_loader_version: project.fabric_loader_version,
+    fabric_api_version: project.fabric_api_version
+]
+
+processResources {
+  inputs.properties(metadata)
+  filesMatching('fabric.mod.json') {
+    expand(metadata)
+  }
+}
+
+java {
+  toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
+  withSourcesJar()
+  sourceCompatibility = JavaVersion.VERSION_25
+  targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.named('jar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-fabric.jar"
+  from(rootProject.file('LICENSE')) {
+    rename { 'LICENSE_noisy-neighbors' }
+  }
+}
+
+tasks.named('sourcesJar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-fabric-sources.jar"
+}
+
+publishing {
+  publications {
+    create('mavenJava', MavenPublication) {
+      from components.java
+    }
+  }
+}

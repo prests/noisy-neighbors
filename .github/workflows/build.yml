@@ -23,13 +23,62 @@ jobs:
         with:
           distribution: microsoft
           java-version: '25'
-      - name: Build and run JVM/server tests
+      - name: Build and test both loaders
         run: ./gradlew build
+      - name: Verify distributable artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          fabric=(fabric/build/libs/*-fabric.jar)
+          neoforge=(neoforge/build/libs/*-neoforge.jar)
+          [[ ${#fabric[@]} -eq 1 ]] || { printf 'Expected one Fabric JAR, found: %s\n' "${fabric[*]:-none}" >&2; exit 1; }
+          [[ ${#neoforge[@]} -eq 1 ]] || { printf 'Expected one NeoForge JAR, found: %s\n' "${neoforge[*]:-none}" >&2; exit 1; }
       - name: Install headless OpenGL dependencies
         run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
-      - name: Run production client GameTest
+      - name: Run Fabric production client GameTest
         env:
           ALSOFT_DRIVERS: "null"
           LIBGL_ALWAYS_SOFTWARE: "1"
           MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
         run: ./gradlew runProductionClientGameTest
+      - name: Stage NeoForge production client test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p run/mods
+          cp neoforge/build/libs/*-neoforge.jar run/mods/
+          cp neoforge/build/libs/*-neoforge-client-test.jar run/mods/
+          rm -f run/noisy-neighbors-neoforge-success
+      - name: Run NeoForge production client test
+        uses: headlesshq/mc-runtime-test@dfc8a2a0145f723b01abda5e1cf59eaba516d128 # 5.0.0
+        with:
+          mc: '26.3'
+          modloader: neoforge
+          java: '25'
+          mc-runtime-test: neoforge
+          mc-runtime-test-version: '5.0.0'
+          cache-mc: github
+          headlessmc-command: '--jvm "-Djava.awt.headless=true -DMcRuntimeGameTest=false"'
+      - name: Verify NeoForge client assertions ran
+        run: test -f run/noisy-neighbors-neoforge-success
+      - name: Upload distributable artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: noisy-neighbors-jars
+          if-no-files-found: error
+          path: |
+            fabric/build/libs/*-fabric.jar
+            neoforge/build/libs/*-neoforge.jar
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failure-diagnostics
+          if-no-files-found: ignore
+          path: |
+            **/build/reports/**
+            **/build/test-results/**
+            **/logs/**
+            run/logs/**
+            run/crash-reports/**

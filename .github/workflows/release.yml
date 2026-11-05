@@ -12,26 +12,25 @@ jobs:
     outputs:
       tag: ${{ steps.release.outputs.tag }}
       commit: ${{ steps.release.outputs.commit }}
-      version: ${{ steps.release.outputs.version }}
+      source_version: ${{ steps.release.outputs.source_version }}
+      fabric_version: ${{ steps.release.outputs.fabric_version }}
+      neoforge_version: ${{ steps.release.outputs.neoforge_version }}
+      minecraft_version: ${{ steps.release.outputs.minecraft_version }}
       type: ${{ steps.release.outputs.type }}
       prerelease: ${{ steps.release.outputs.prerelease }}
     steps:
-      - name: Check out main
+      - name: Check out selected branch
         uses: actions/checkout@v7
         with:
-          ref: main
           fetch-depth: 0
           persist-credentials: false
-
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v6
-
       - name: Set up JDK 25
         uses: actions/setup-java@v6
         with:
           distribution: microsoft
           java-version: '25'
-
       - name: Read release metadata
         id: release
         shell: bash
@@ -42,17 +41,20 @@ jobs:
           minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2-)"
           test -n "$version"
           test -n "$minecraft_version"
-          release_version="v$version-mc$minecraft_version-fabric"
-          tag="$release_version"
+          source_version="v$version-mc$minecraft_version"
+          legacy_fabric_version="$source_version-fabric"
+          tag="$source_version"
 
-          if git ls-remote --exit-code --refs origin "refs/tags/$tag" >/dev/null; then
-            echo "Tag $tag already exists; refusing to publish a duplicate release." >&2
-            exit 1
-          fi
+          for existing in "$tag" "$legacy_fabric_version"; do
+            if git ls-remote --exit-code --refs origin "refs/tags/$existing" >/dev/null; then
+              echo "Tag $existing already exists; refusing to publish a duplicate release." >&2
+              exit 1
+            fi
+          done
 
           git log -1 --format=%b > RELEASE_NOTES.md
           if ! grep -q '[[:alnum:]]' RELEASE_NOTES.md; then
-            echo "The latest main commit has no release-note body." >&2
+            echo "The selected branch's latest commit has no release-note body." >&2
             exit 1
           fi
 
@@ -65,56 +67,83 @@ jobs:
           fi
 
           {
-            echo "version=$release_version"
+            echo "source_version=$source_version"
+            echo "fabric_version=$source_version-fabric"
+            echo "neoforge_version=$source_version-neoforge"
+            echo "minecraft_version=$minecraft_version"
             echo "tag=$tag"
             echo "type=$type"
             echo "prerelease=$prerelease"
             echo "commit=$(git rev-parse HEAD)"
           } >> "$GITHUB_OUTPUT"
-
-      - name: Build and run JVM/server tests
+      - name: Build and test both loaders
         run: ./gradlew build
-
       - name: Install headless OpenGL dependencies
         run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri mesa-vulkan-drivers
-
-      - name: Run production client GameTest
+      - name: Run Fabric production client GameTest
         env:
           ALSOFT_DRIVERS: "null"
           LIBGL_ALWAYS_SOFTWARE: "1"
           MESA_LOADER_DRIVER_OVERRIDE: llvmpipe
         run: ./gradlew runProductionClientGameTest
-
-      - name: Create SHA-256 checksum
+      - name: Stage NeoForge production client test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p run/mods
+          cp neoforge/build/libs/*-neoforge.jar run/mods/
+          cp neoforge/build/libs/*-neoforge-client-test.jar run/mods/
+          rm -f run/noisy-neighbors-neoforge-success
+      - name: Run NeoForge production client test
+        uses: headlesshq/mc-runtime-test@dfc8a2a0145f723b01abda5e1cf59eaba516d128 # 5.0.0
+        with:
+          mc: '26.3'
+          modloader: neoforge
+          java: '25'
+          mc-runtime-test: neoforge
+          mc-runtime-test-version: '5.0.0'
+          cache-mc: github
+          headlessmc-command: '--jvm "-Djava.awt.headless=true -DMcRuntimeGameTest=false"'
+      - name: Verify NeoForge client assertions ran
+        run: test -f run/noisy-neighbors-neoforge-success
+      - name: Prepare release artifacts
         shell: bash
         run: |
           set -euo pipefail
           shopt -s nullglob
-          jars=(build/libs/*.jar)
-          artifacts=()
-          for jar in "${jars[@]}"; do
-            case "$jar" in
-              *-dev.jar|*-sources.jar|*-javadoc.jar|*-gametest.jar) ;;
-              *) artifacts+=("$jar") ;;
-            esac
-          done
+          fabric=(fabric/build/libs/*-fabric.jar)
+          neoforge=(neoforge/build/libs/*-neoforge.jar)
+          [[ ${#fabric[@]} -eq 1 ]] || { printf 'Expected one Fabric JAR, found: %s\n' "${fabric[*]:-none}" >&2; exit 1; }
+          [[ ${#neoforge[@]} -eq 1 ]] || { printf 'Expected one NeoForge JAR, found: %s\n' "${neoforge[*]:-none}" >&2; exit 1; }
 
-          if [[ ${#artifacts[@]} -ne 1 ]]; then
-            printf 'Expected exactly one distributable JAR; found: %s\n' "${artifacts[*]:-none}" >&2
-            exit 1
-          fi
-
+          version="$(grep -E '^version=' gradle.properties | cut -d= -f2-)"
+          minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2-)"
           mkdir release
-          cp "${artifacts[0]}" release/release.jar
-          sha256sum release/release.jar > release/release.jar.sha256
+          fabric_target="release/noisy-neighbors-$version-mc$minecraft_version-fabric.jar"
+          neoforge_target="release/noisy-neighbors-$version-mc$minecraft_version-neoforge.jar"
+          cp "${fabric[0]}" "$fabric_target"
+          cp "${neoforge[0]}" "$neoforge_target"
+          sha256sum "$fabric_target" > "$fabric_target.sha256"
+          sha256sum "$neoforge_target" > "$neoforge_target.sha256"
           cp RELEASE_NOTES.md release/
-
       - name: Upload release artifacts
         uses: actions/upload-artifact@v7
         with:
           name: release-artifacts
           if-no-files-found: error
           path: release/*
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failure-diagnostics
+          if-no-files-found: ignore
+          path: |
+            **/build/reports/**
+            **/build/test-results/**
+            **/logs/**
+            run/logs/**
+            run/crash-reports/**
 
   publish:
     needs: build
@@ -128,8 +157,7 @@ jobs:
         with:
           name: release-artifacts
           path: release
-
-      - name: Publish release
+      - name: Publish Fabric and create GitHub release
         uses: Kira-NT/mc-publish@v3
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -140,12 +168,36 @@ jobs:
           github-tag: ${{ needs.build.outputs.tag }}
           github-commitish: ${{ needs.build.outputs.commit }}
           github-files: |
-            release/release.jar
-            release/release.jar.sha256
-          files: release/release.jar
-          name: Noisy Neighbors ${{ needs.build.outputs.version }}
-          version: ${{ needs.build.outputs.version }}
+            release/*-fabric.jar
+            release/*-fabric.jar.sha256
+            release/*-neoforge.jar
+            release/*-neoforge.jar.sha256
+          files: release/*-fabric.jar
+          name: Noisy Neighbors ${{ needs.build.outputs.fabric_version }}
+          github-name: Noisy Neighbors ${{ needs.build.outputs.source_version }}
+          version: ${{ needs.build.outputs.fabric_version }}
           version-type: ${{ needs.build.outputs.type }}
+          loaders: fabric
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          java: 25
+          environment: client
+          dependencies: fabric-api(required)
           changelog-file: release/RELEASE_NOTES.md
           github-generate-changelog: false
           github-prerelease: ${{ needs.build.outputs.prerelease }}
+      - name: Publish NeoForge
+        uses: Kira-NT/mc-publish@v3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: release/*-neoforge.jar
+          name: Noisy Neighbors ${{ needs.build.outputs.neoforge_version }}
+          version: ${{ needs.build.outputs.neoforge_version }}
+          version-type: ${{ needs.build.outputs.type }}
+          loaders: neoforge
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          java: 25
+          environment: client
+          changelog-file: release/RELEASE_NOTES.md
