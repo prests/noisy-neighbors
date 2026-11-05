@@ -3,25 +3,53 @@
 Use JDK 25 for Gradle and Minecraft 1.21.1 for every run. The compiled mod targets Java 21, so players can use Java 21 or newer.
 
 ```sh
-./gradlew test
+./gradlew clean
+./gradlew :common:test
+./gradlew :fabric:build
+./gradlew :neoforge:build
 ./gradlew build
-./gradlew runClient
 ```
 
-`test` covers catalog, policy, world identity, zones, and settings persistence. `build` also remaps the distributable JAR to `build/libs/`. The Fabric API version used by this project has no client GameTest harness, so test sound interception, screens, controls, and rendering in `runClient`.
+Run each development client separately:
+
+```sh
+./gradlew :fabric:runClient
+./gradlew :neoforge:runClient
+```
+
+Fabric uses `run/fabric`; NeoForge uses `run/neoforge`. Keep the directories separate. To test settings portability, copy only `config/noisy-neighbors.json` between them.
+
+Distributable JARs are written to:
+
+- `fabric/build/libs/noisy-neighbors-<version>-mc1.21.1-fabric.jar`
+- `neoforge/build/libs/noisy-neighbors-<version>-mc1.21.1-neoforge.jar`
 
 ## Manual client smoke test
 
-- Open **Options → Music & Sound → Advanced Sound Controls**; verify search, sliders, advanced controls, keyboard focus, and Escape/Done navigation.
-- Set a cow to zero volume and zero chattiness, then restore normal values.
-- Create overlapping zones; test inside/outside volume and chattiness, rename, recolor, edit bounds, toggle, delete, and outlines in each dimension.
-- Test remappable **K**, **Z**, and **U** controls, reconnect/disconnect, world/server separation, restart persistence, and a multiplayer server without the mod installed.
-- Load and save a settings file containing newer-version entries; they must remain in JSON but not appear in the 1.21.1 controls.
+Run every item on both loaders.
+
+- Reach the main menu with no mod-loading, Mixin, or missing-asset errors.
+- Open **Options → Music & Sound → Advanced Sound Controls**; verify search, sliders, advanced controls, keyboard focus, narration, and Escape/Done navigation.
+- Verify the three remappable controls appear, then test **K**, **Z**, and **U**.
+- Set cow volume and chattiness to zero, test an intermediate value and one per-event value, then restore them.
+- Create, edit, overlap, recolor, disable, and delete zones; verify outlines in multiple dimensions and graphics modes.
+- Verify zone selection consumes main-hand block use, ignores offhand use, cancels correctly, and resets after disconnect.
+- Verify moving sounds retain scaling and Minecraft category-volume changes do not remove Noisy Neighbors scaling.
+- Verify local worlds and normalized server addresses remain separate and deleting their entries removes their saved zones.
+- Load malformed, unsupported, and newer-version settings and confirm existing safe handling remains intact.
+- Connect to a server without Noisy Neighbors installed; no custom handshake should occur.
+- Copy a settings file created by one loader to the other and verify it loads unchanged.
+
+On NeoForge, also test with a sound listener or compatible mod that replaces a `SoundInstance` when practical; policy must apply to the replacement sound.
+
+## Artifact inspection
+
+The Fabric JAR must contain `fabric.mod.json` and the Fabric adapter, but no NeoForge metadata or adapter. The NeoForge JAR must contain `META-INF/neoforge.mods.toml` and the NeoForge adapter, but no Fabric metadata or adapter. Both must contain common classes, Mixins, the shared Mixin config, and `assets/noisy-neighbors/**` without bundling loader, Minecraft, Mixin, Gson, or SLF4J dependencies.
 
 ## IntelliJ IDEA
 
-1. Install a JDK 25 and set it as both **Project SDK** and **Gradle JVM**. Loom 1.19.3 requires Java 25 even though the mod is compiled for Java 21.
-2. Choose **File → Open**, select this repository's `build.gradle`, then choose **Open as Project**. Let IntelliJ import the Gradle project and download sources.
-3. In the Gradle tool window, run `Tasks → fabric → runClient` (or create a Gradle run configuration for `runClient`). This creates and launches the 1.21.1 development client using the `run/` directory.
-4. Run `Tasks → verification → test` for JVM tests and `Tasks → build → build` for the remapped JAR. Use the Gradle task, rather than IntelliJ's plain Application runner, so Fabric's generated classpath and run configuration are used.
-5. If the IDE reports stale mappings after changing Gradle files, click **Reload All Gradle Projects** and rerun `runClient`.
+1. Install JDK 25 and set it as the Gradle JVM. The source toolchain remains Java 21.
+2. Open the repository root as a Gradle project and reload all Gradle projects.
+3. Verify the run selector contains **Noisy Neighbors - Fabric Client** and **Noisy Neighbors - NeoForge Client**.
+4. Run and debug each configuration. The selected configuration should persist in the selector.
+5. If plugin-generated configurations are stale, use the committed `.run/` Gradle configurations or run the module tasks above.

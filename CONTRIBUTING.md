@@ -5,29 +5,35 @@ Thanks for helping improve Noisy Neighbors! We appreciate you wanting to get inv
 ## Compatibility
 
 - Minecraft Java Edition 1.21.1
-- Fabric Loader 0.15.11 or newer
 - Java 21
-- Fabric API 0.116.17+1.21.1 or newer
+- Fabric Loader 0.20.1 and Fabric API 0.116.17+1.21.1, or NeoForge 21.1.265
 
-Fabric is the only supported loader.
+## Project structure
+
+- `common/` contains shared gameplay, UI, persistence, assets, tests, and Mixins. It must not import Fabric or NeoForge classes.
+- `fabric/` contains only Fabric bootstrap code and metadata.
+- `neoforge/` contains only NeoForge bootstrap code and metadata.
+
+Prefer vanilla Minecraft APIs in `common`. Add loader-specific code only for lifecycle, event, rendering, key-registration, or config-path integration that cannot be shared cleanly. Do not duplicate shared classes between loader projects.
 
 ## Development
 
-Install JDK 25 for Gradle and import this directory as a Gradle project. The mod itself targets Java 21. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended by Fabric; VS Code is also supported.
+Install JDK 25 for Gradle and import the repository root as a Gradle project. The mod source targets Java 21.
 
 ```sh
-./gradlew runClient
-./gradlew test
+./gradlew :common:test
+./gradlew :fabric:runClient
+./gradlew :neoforge:runClient
 ./gradlew build
 ```
 
-`runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
+The clients use separate `run/fabric` and `run/neoforge` directories. IntelliJ should expose **Noisy Neighbors - Fabric Client** and **Noisy Neighbors - NeoForge Client** after Gradle sync; committed `.run/` configurations are provided as a fallback.
 
-**Note:** See [Our Testing Doc](TESTING.md) for more information and best practices to ensure proper test coverage.
+Distributable artifacts are written to `fabric/build/libs/*-fabric.jar` and `neoforge/build/libs/*-neoforge.jar`. See [TESTING.md](TESTING.md) for complete verification steps.
 
 ## Support and end-of-life policy
 
-`main` supports the newest Minecraft release and the newest mod major version. Releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3-fabric` is mod version `2.1.0` for Minecraft `26.3`.
+`main` supports the newest Minecraft release and the newest mod major version. Source releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3` is mod version `2.1.0` for Minecraft `26.3`; published platform versions add a loader suffix.
 
 A long-term-support branch is created only when a supported combination has moved off `main`. Its name is `lts/v<mod-major>.x-mc<minecraft-version>`; for example, `lts/v1.x-mc26.3`. Do not create a branch for the combination currently on `main`.
 

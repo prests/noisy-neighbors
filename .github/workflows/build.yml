@@ -22,5 +22,22 @@ jobs:
         with:
           distribution: microsoft
           java-version: '25'
-      - name: Build and run JVM/server tests
+      - name: Build and test both loaders
         run: ./gradlew build
+      - name: Verify distributable artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          fabric=(fabric/build/libs/*-fabric.jar)
+          neoforge=(neoforge/build/libs/*-neoforge.jar)
+          [[ ${#fabric[@]} -eq 1 ]] || { printf 'Expected one Fabric JAR, found: %s\n' "${fabric[*]:-none}" >&2; exit 1; }
+          [[ ${#neoforge[@]} -eq 1 ]] || { printf 'Expected one NeoForge JAR, found: %s\n' "${neoforge[*]:-none}" >&2; exit 1; }
+      - name: Upload distributable artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: noisy-neighbors-jars
+          if-no-files-found: error
+          path: |
+            fabric/build/libs/*-fabric.jar
+            neoforge/build/libs/*-neoforge.jar

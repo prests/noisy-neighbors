@@ -1,54 +1,44 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
-	id 'maven-publish'
+  id 'base'
+  id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
+  id 'net.neoforged.moddev' version "${moddevgradle_version}" apply false
 }
 
-repositories {
-	// Loom adds the repositories needed for Minecraft and Fabric dependencies.
+allprojects {
+  group = rootProject.group
+  version = rootProject.version
 }
 
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+subprojects {
+  repositories {
+    maven {
+      name = 'Fabric'
+      url = 'https://maven.fabricmc.net/'
+    }
+    mavenCentral()
+  }
+
+  tasks.withType(JavaCompile).configureEach {
+    options.release = rootProject.java_version as int
+  }
 }
 
-processResources {
-	def version = project.version
-	inputs.property "version", version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": version
-	}
+tasks.named('clean') {
+  dependsOn(':common:clean', ':fabric:clean', ':neoforge:clean')
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+tasks.named('build') {
+  dependsOn(':common:test', ':fabric:build', ':neoforge:build')
 }
 
-tasks.named("test") {
-	useJUnitPlatform()
+tasks.register('runFabricClient') {
+  group = 'application'
+  description = 'Runs the Fabric development client.'
+  dependsOn(':fabric:runClient')
 }
 
-java {
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	def projectName = project.name
-	from("LICENSE") {
-		rename { "${it}_${projectName}" }
-	}
-}
-
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
-	}
+tasks.register('runNeoForgeClient') {
+  group = 'application'
+  description = 'Runs the NeoForge development client.'
+  dependsOn(':neoforge:runClient')
 }
