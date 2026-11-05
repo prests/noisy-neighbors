@@ -25,7 +25,6 @@ actions:
       - Kira-NT/mc-publish@*
       - headlesshq/mc-runtime-test@dfc8a2a0145f723b01abda5e1cf59eaba516d128
       - robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f
-      - useblacksmith/cache@71c7c918062ba3861252d84b07fe5ab2a6b467a6
   default_workflow_permissions: read
   can_approve_pull_request_reviews: false
 
