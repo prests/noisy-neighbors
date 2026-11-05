@@ -1,0 +1,78 @@
+plugins {
+  id 'net.fabricmc.fabric-loom-remap'
+  id 'maven-publish'
+}
+
+configurations {
+  commonJava {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+  commonResources {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+}
+
+dependencies {
+  commonJava project(path: ':common', configuration: 'commonJava')
+  commonResources project(path: ':common', configuration: 'commonResources')
+
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  mappings loom.officialMojangMappings()
+  modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+  modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+sourceSets.main.java.srcDirs(configurations.commonJava)
+sourceSets.main.resources.srcDirs(configurations.commonResources)
+
+loom {
+  runs {
+    client {
+      client()
+      displayName.set('Noisy Neighbors - Fabric Client')
+      generateRunConfig.set(true)
+      runDirectory.set(rootProject.layout.projectDirectory.dir('run/fabric'))
+    }
+  }
+}
+
+def modVersion = project.version.toString()
+def minecraftVersion = project.minecraft_version.toString()
+
+processResources {
+  inputs.property('version', modVersion)
+  filesMatching('fabric.mod.json') {
+    expand('version': modVersion)
+  }
+}
+
+java {
+  toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
+  withSourcesJar()
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.named('jar') {
+  from(rootProject.file('LICENSE')) {
+    rename { 'LICENSE_noisy-neighbors' }
+  }
+}
+
+tasks.named('remapJar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-fabric.jar"
+}
+
+tasks.named('remapSourcesJar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-fabric-sources.jar"
+}
+
+publishing {
+  publications {
+    create('mavenJava', MavenPublication) {
+      from components.java
+    }
+  }
+}

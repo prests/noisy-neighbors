@@ -1,0 +1,77 @@
+plugins {
+  id 'net.neoforged.moddev'
+  id 'maven-publish'
+}
+
+configurations {
+  commonJava {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+  commonResources {
+    canBeConsumed = false
+    canBeResolved = true
+  }
+}
+
+dependencies {
+  commonJava project(path: ':common', configuration: 'commonJava')
+  commonResources project(path: ':common', configuration: 'commonResources')
+}
+
+sourceSets.main.java.srcDirs(configurations.commonJava)
+sourceSets.main.resources.srcDirs(configurations.commonResources)
+
+neoForge {
+  version = project.neoforge_version
+
+  runs {
+    client {
+      client()
+      ideName.set('Noisy Neighbors - NeoForge Client')
+      gameDirectory.set(rootProject.layout.projectDirectory.dir('run/neoforge'))
+    }
+  }
+
+  mods {
+    noisy_neighbors {
+      sourceSet sourceSets.main
+    }
+  }
+}
+
+def modVersion = project.version.toString()
+def minecraftVersion = project.minecraft_version.toString()
+
+processResources {
+  inputs.property('version', modVersion)
+  filesMatching('META-INF/neoforge.mods.toml') {
+    expand('version': modVersion)
+  }
+}
+
+java {
+  toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
+  withSourcesJar()
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.named('jar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-neoforge.jar"
+  from(rootProject.file('LICENSE')) {
+    rename { 'LICENSE_noisy-neighbors' }
+  }
+}
+
+tasks.named('sourcesJar') {
+  archiveFileName = "noisy-neighbors-${modVersion}-mc${minecraftVersion}-neoforge-sources.jar"
+}
+
+publishing {
+  publications {
+    create('mavenJava', MavenPublication) {
+      from components.java
+    }
+  }
+}

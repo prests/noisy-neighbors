@@ -12,7 +12,10 @@ jobs:
     outputs:
       tag: ${{ steps.release.outputs.tag }}
       commit: ${{ steps.release.outputs.commit }}
-      version: ${{ steps.release.outputs.version }}
+      source_version: ${{ steps.release.outputs.source_version }}
+      fabric_version: ${{ steps.release.outputs.fabric_version }}
+      neoforge_version: ${{ steps.release.outputs.neoforge_version }}
+      minecraft_version: ${{ steps.release.outputs.minecraft_version }}
       type: ${{ steps.release.outputs.type }}
       prerelease: ${{ steps.release.outputs.prerelease }}
     steps:
@@ -41,8 +44,8 @@ jobs:
           minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2-)"
           test -n "$version"
           test -n "$minecraft_version"
-          release_version="v$version-mc$minecraft_version-fabric"
-          tag="$release_version"
+          source_version="v$version-mc$minecraft_version"
+          tag="$source_version"
 
           if git ls-remote --exit-code --refs origin "refs/tags/$tag" >/dev/null; then
             echo "Tag $tag already exists; refusing to publish a duplicate release." >&2
@@ -64,38 +67,38 @@ jobs:
           fi
 
           {
-            echo "version=$release_version"
+            echo "source_version=$source_version"
+            echo "fabric_version=$source_version-fabric"
+            echo "neoforge_version=$source_version-neoforge"
+            echo "minecraft_version=$minecraft_version"
             echo "tag=$tag"
             echo "type=$type"
             echo "prerelease=$prerelease"
             echo "commit=$(git rev-parse HEAD)"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Build and run JVM/server tests
+      - name: Build and test both loaders
         run: ./gradlew build
 
-      - name: Create SHA-256 checksum
+      - name: Prepare release artifacts
         shell: bash
         run: |
           set -euo pipefail
           shopt -s nullglob
-          jars=(build/libs/*.jar)
-          artifacts=()
-          for jar in "${jars[@]}"; do
-            case "$jar" in
-              *-dev.jar|*-sources.jar|*-javadoc.jar|*-gametest.jar) ;;
-              *) artifacts+=("$jar") ;;
-            esac
-          done
+          fabric=(fabric/build/libs/*-fabric.jar)
+          neoforge=(neoforge/build/libs/*-neoforge.jar)
+          [[ ${#fabric[@]} -eq 1 ]] || { printf 'Expected one Fabric JAR, found: %s\n' "${fabric[*]:-none}" >&2; exit 1; }
+          [[ ${#neoforge[@]} -eq 1 ]] || { printf 'Expected one NeoForge JAR, found: %s\n' "${neoforge[*]:-none}" >&2; exit 1; }
 
-          if [[ ${#artifacts[@]} -ne 1 ]]; then
-            printf 'Expected exactly one distributable JAR; found: %s\n' "${artifacts[*]:-none}" >&2
-            exit 1
-          fi
-
+          version="$(grep -E '^version=' gradle.properties | cut -d= -f2-)"
+          minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2-)"
           mkdir release
-          cp "${artifacts[0]}" release/release.jar
-          sha256sum release/release.jar > release/release.jar.sha256
+          fabric_target="release/noisy-neighbors-$version-mc$minecraft_version-fabric.jar"
+          neoforge_target="release/noisy-neighbors-$version-mc$minecraft_version-neoforge.jar"
+          cp "${fabric[0]}" "$fabric_target"
+          cp "${neoforge[0]}" "$neoforge_target"
+          sha256sum "$fabric_target" > "$fabric_target.sha256"
+          sha256sum "$neoforge_target" > "$neoforge_target.sha256"
           cp RELEASE_NOTES.md release/
 
       - name: Upload release artifacts
@@ -118,7 +121,7 @@ jobs:
           name: release-artifacts
           path: release
 
-      - name: Publish release
+      - name: Publish Fabric and create GitHub release
         uses: Kira-NT/mc-publish@v3
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -129,12 +132,37 @@ jobs:
           github-tag: ${{ needs.build.outputs.tag }}
           github-commitish: ${{ needs.build.outputs.commit }}
           github-files: |
-            release/release.jar
-            release/release.jar.sha256
-          files: release/release.jar
-          name: Noisy Neighbors ${{ needs.build.outputs.version }}
-          version: ${{ needs.build.outputs.version }}
+            release/*-fabric.jar
+            release/*-fabric.jar.sha256
+            release/*-neoforge.jar
+            release/*-neoforge.jar.sha256
+          files: release/*-fabric.jar
+          name: Noisy Neighbors ${{ needs.build.outputs.fabric_version }}
+          github-name: Noisy Neighbors ${{ needs.build.outputs.source_version }}
+          version: ${{ needs.build.outputs.fabric_version }}
           version-type: ${{ needs.build.outputs.type }}
+          loaders: fabric
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          java: 21
+          environment: client
+          dependencies: fabric-api(required)
           changelog-file: release/RELEASE_NOTES.md
           github-generate-changelog: false
           github-prerelease: ${{ needs.build.outputs.prerelease }}
+
+      - name: Publish NeoForge
+        uses: Kira-NT/mc-publish@v3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: release/*-neoforge.jar
+          name: Noisy Neighbors ${{ needs.build.outputs.neoforge_version }}
+          version: ${{ needs.build.outputs.neoforge_version }}
+          version-type: ${{ needs.build.outputs.type }}
+          loaders: neoforge
+          game-versions: ${{ needs.build.outputs.minecraft_version }}
+          java: 21
+          environment: client
+          changelog-file: release/RELEASE_NOTES.md

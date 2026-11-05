@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="noisy_neighbors"
+version="${version}"
+displayName="Noisy Neighbors"
+authors="Shayne Preston"
+description='''Granular sound controls for Minecraft entities and locations.'''
+logoFile="assets/noisy-neighbors/icon.png"
+
+[[mixins]]
+config="noisy-neighbors.client.mixins.json"
+
+[[dependencies.noisy_neighbors]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.265,21.2)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.noisy_neighbors]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="CLIENT"
