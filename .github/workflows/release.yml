@@ -96,6 +96,8 @@ jobs:
           rm -f run/noisy-neighbors-neoforge-success
       - name: Run NeoForge production client test
         uses: headlesshq/mc-runtime-test@dfc8a2a0145f723b01abda5e1cf59eaba516d128 # 5.0.0
+        env:
+          ALSOFT_DRIVERS: "null"
         with:
           mc: '26.3'
           modloader: neoforge
