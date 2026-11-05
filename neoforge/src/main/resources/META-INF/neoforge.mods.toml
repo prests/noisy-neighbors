@@ -1,0 +1,26 @@
+license="MIT"
+
+[[mods]]
+modId="${mod_id}"
+version="${version}"
+displayName="Noisy Neighbors"
+authors="Shayne Preston"
+description='''Granular sound controls for Minecraft entities and locations.'''
+iconFile="assets/noisy-neighbors/icon.png"
+
+[[mixins]]
+config="noisy-neighbors.client.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="[${neoforge_version},26.4)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version}]"
+ordering="NONE"
+side="CLIENT"

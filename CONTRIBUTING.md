@@ -5,30 +5,36 @@ Thanks for helping improve Noisy Neighbors! We appreciate you wanting to get inv
 ## Compatibility
 
 - Minecraft Java Edition 26.3
-- Fabric Loader 0.19.5
 - Java 25
-- Fabric API 0.161.0+26.3
+- Fabric Loader 0.20.1 and Fabric API 0.165.0+26.3, or NeoForge 26.3.0.101
 
-Fabric is the only supported loader.
+## Project structure
+
+- `common/` contains shared gameplay, UI, persistence, assets, tests, client-test support, and Mixins. It must not import Fabric or NeoForge classes.
+- `fabric/` contains Fabric bootstrap code, metadata, packaging, and the production client GameTest.
+- `neoforge/` contains NeoForge bootstrap code, metadata, packaging, and the test-only production client harness.
+
+Prefer vanilla Minecraft APIs in `common`. Add loader-specific code only for lifecycle, events, rendering, key registration, config paths, or runtime test integration.
 
 ## Development
 
-Install JDK 25 and import this directory as a Gradle project. [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended by Fabric; VS Code is also supported.
+Install JDK 25 and import the repository root as a Gradle project.
 
 ```sh
-./gradlew runClient
 ./gradlew test
 ./gradlew build
+./gradlew runFabricClient
+./gradlew runNeoForgeClient
 ./gradlew runProductionClientGameTest
 ```
 
-`runClient` starts a development client. `build` writes the distributable mod JAR to `build/libs/`.
+The clients use separate `run/fabric` and `run/neoforge` directories. Distributable artifacts are written to `fabric/build/libs/*-fabric.jar` and `neoforge/build/libs/*-neoforge.jar`. See [TESTING.md](TESTING.md) for the full verification tiers.
 
 **Note:** See [Our Testing Doc](TESTING.md) for more information and best practices to ensure proper test coverage.
 
 ## Support and end-of-life policy
 
-`main` supports the newest Minecraft release and the newest mod major version. Releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3-fabric` is mod version `2.1.0` for Minecraft `26.3`.
+`main` supports the newest Minecraft release and the newest mod major version. Source releases use independent mod and Minecraft versions: for example, `v2.1.0-mc26.3` is mod version `2.1.0` for Minecraft `26.3`; published platform versions add a loader suffix.
 
 A long-term-support branch is created only when a supported combination has moved off `main`. Its name is `lts/v<mod-major>.x-mc<minecraft-version>`; for example, `lts/v1.x-mc26.3`. Do not create a branch for the combination currently on `main`.
 

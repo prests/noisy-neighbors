@@ -1,0 +1,49 @@
+plugins {
+  id 'net.neoforged.moddev'
+  id 'java'
+}
+
+neoForge {
+  neoFormVersion = project.neoform_version
+}
+
+configurations {
+  commonJava {
+    canBeConsumed = true
+    canBeResolved = false
+  }
+  commonResources {
+    canBeConsumed = true
+    canBeResolved = false
+  }
+  clientTestJava {
+    canBeConsumed = true
+    canBeResolved = false
+  }
+}
+
+artifacts {
+  commonJava(file('src/main/java'))
+  commonResources(file('src/main/resources'))
+  clientTestJava(file('src/clientTest/java'))
+}
+
+dependencies {
+  compileOnly('net.fabricmc:sponge-mixin:0.16.5+mixin.0.8.7')
+
+  testImplementation(platform('org.junit:junit-bom:5.10.0'))
+  testImplementation('org.junit.jupiter:junit-jupiter')
+  testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+  testRuntimeOnly('com.google.code.gson:gson:2.10.1')
+  testRuntimeOnly('org.slf4j:slf4j-api:2.0.9')
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+java {
+  toolchain.languageVersion = JavaLanguageVersion.of(project.java_version as int)
+  sourceCompatibility = JavaVersion.VERSION_25
+  targetCompatibility = JavaVersion.VERSION_25
+}

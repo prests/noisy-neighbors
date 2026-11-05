@@ -29,7 +29,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Apply repository settings
-        uses: Vivswan/github-settings-as-code@v2
+        uses: Vivswan/github-settings-as-code@046adf3b24454f26f569850630809bcf481f8b84 # v2
         with:
           token: ${{ secrets.ADMIN_TOKEN }}
           mode: ${{ inputs.mode || 'apply' }}

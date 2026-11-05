@@ -20,9 +20,12 @@ actions:
     github_owned_allowed: true
     verified_allowed: false
     patterns_allowed:
-      - Vivswan/github-settings-as-code@*
-      - gradle/actions/wrapper-validation@*
-      - Kira-NT/mc-publish@*
+      - Vivswan/github-settings-as-code@046adf3b24454f26f569850630809bcf481f8b84
+      - gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c
+      - Kira-NT/mc-publish@c23376546a97f5ba7984e94445da359459b14419
+      - headlesshq/mc-runtime-test@dfc8a2a0145f723b01abda5e1cf59eaba516d128
+      - robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f
+      - useblacksmith/cache@71c7c918062ba3861252d84b07fe5ab2a6b467a6
   default_workflow_permissions: read
   can_approve_pull_request_reviews: false
 

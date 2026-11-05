@@ -1,0 +1,29 @@
+license="MIT"
+
+[[mods]]
+modId="noisy_neighbors_test"
+version="1.0.0"
+displayName="Noisy Neighbors Client Tests"
+authors="Shayne Preston"
+description='''Runtime checks for the installed Noisy Neighbors NeoForge artifact.'''
+
+[[dependencies.noisy_neighbors_test]]
+modId="neoforge"
+type="required"
+versionRange="[${neoforge_version},26.4)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.noisy_neighbors_test]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version}]"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.noisy_neighbors_test]]
+modId="noisy_neighbors"
+type="required"
+versionRange="[${version}]"
+ordering="AFTER"
+side="CLIENT"

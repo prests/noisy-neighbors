@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "noisy-neighbors",
+  "version": "${version}",
+  "name": "Noisy Neighbors",
+  "description": "Granular sound controls for Minecraft entities and locations.",
+  "authors": ["Shayne Preston"],
+  "contact": {
+    "sources": "https://github.com/prests/noisy-neighbors"
+  },
+  "license": "MIT",
+  "icon": "assets/noisy-neighbors/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.github.prests.noisyneighbors.fabric.NoisyNeighborsFabricClient"]
+  },
+  "mixins": ["noisy-neighbors.client.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=${java_version}",
+    "fabric-api": ">=${fabric_api_version}"
+  }
+}
