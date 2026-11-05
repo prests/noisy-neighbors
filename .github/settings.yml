@@ -43,8 +43,8 @@ rulesets:
       ref_name:
         include:
           - ~DEFAULT_BRANCH
-          - lts-mc*
-          - archive-mc*
+          - lts/v*
+          - archive/v*
         exclude: []
     rules:
       - type: deletion
